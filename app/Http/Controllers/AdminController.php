@@ -8,6 +8,7 @@ use App\Models\Vote;
 use App\Models\User;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\VoteExport;
+use App\Models\ImportFile;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
 
@@ -15,10 +16,13 @@ class AdminController extends Controller
 {
     public function dashboard()
     {
-        $session = VotingSession::latest()->first();
-        $candidates = User::where('is_candidate', true)->get();
+        $session          = VotingSession::latest()->first();
+        $lastVoterFile    = ImportFile::where('type','voters')->latest()->first();
+        $lastCandidateFile= ImportFile::where('type','candidates')->latest()->first();
 
-        return view('admin.dashboard', compact('session', 'candidates'));
+        return view('admin.dashboard', compact(
+            'session', 'lastVoterFile', 'lastCandidateFile'
+        ));
     }
 
     public function startVoting()
