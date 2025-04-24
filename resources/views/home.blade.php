@@ -1,23 +1,29 @@
 @extends('layouts.app')
-
 @section('content')
 <div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Dashboard') }}</div>
+    <h2 class="mb-4">صفحه رأی‌دهی</h2>
 
-                <div class="card-body">
-                    @if (session('status'))
-                        <div class="alert alert-success" role="alert">
-                            {{ session('status') }}
-                        </div>
-                    @endif
+    @if(session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
+    @error('voter_id')<div class="alert alert-danger">{{ $message }}</div>@enderror
 
-                    {{ __('You are logged in!') }}
-                </div>
-            </div>
+    <form method="POST" action="{{ route('vote.confirm') }}">
+        @csrf
+        <div class="mb-3">
+            <label for="voter_id" class="form-label">کد ملی رأی‌دهنده</label>
+            <input type="text" name="voter_id" id="voter_id" class="form-control" placeholder="مثلاً ۱۲۳۴۵۶۷۸۹۰" required>
         </div>
-    </div>
+        <div class="mb-3">
+            <label for="candidate_id" class="form-label">انتخاب نامزد</label>
+            <select name="candidate_id" id="candidate_id" class="form-select" required>
+                <option value="">-- یک نامزد را انتخاب کنید --</option>
+                @foreach($candidates as $candidate)
+                    <option value="{{ $candidate->id }}">{{ $candidate->name }}</option>
+                @endforeach
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">ادامه برای تأیید</button>
+    </form>
 </div>
 @endsection

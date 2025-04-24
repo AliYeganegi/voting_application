@@ -2,30 +2,26 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\VotingSession;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use App\Models\VotingSession;
 
-class CheckVotingSession
+class EnsureVotingIsActive
 {
     /**
      * Handle an incoming request.
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next)
+    public function handle($request, Closure $next)
     {
-        $session = VotingSession::where('is_active', true)->latest()->first();
+        $session = VotingSession::where('is_active', true)->first();
 
-        if (!$session
-            || ($session->start_at && now()->lt($session->start_at))
-            || ($session->end_at && now()->gt($session->end_at))
-        ) {
+        if (!$session || now()->lt($session->start_at) || now()->gt($session->end_at)) {
             return redirect()->route('vote.closed');
         }
 
         return $next($request);
     }
-
 }

@@ -18,10 +18,10 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
-        'email',
-        'password',
+        'name','email','password',
+        'national_id','license_number','profile_image','is_candidate','is_operator'
     ];
+
 
     /**
      * The attributes that should be hidden for serialization.
@@ -44,5 +44,10 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function votes()
+    {
+        return $this->hasMany(\App\Models\Vote::class, 'candidate_id');
     }
 }
