@@ -6,8 +6,10 @@
         <dl class="row">
             <dt class="col-sm-3">کد ملی:</dt>
             <dd class="col-sm-9">{{ $voter_id }}</dd>
+            <dt class="col-sm-3">نام رای دهنده:</dt>
+            <dd class="col-sm-9">{{ $first_name }} {{ $last_name }}</dd>
             <dt class="col-sm-3">نامزد انتخابی:</dt>
-            <dd class="col-sm-9">{{ $candidate->first_name }} {{ $candidate->last_name }}</dd>
+            <dd class="col-sm-9">{{ $candidate->name }}</dd>
         </dl>
         <form method="POST" action="{{ route('vote.submit') }}">
             @csrf

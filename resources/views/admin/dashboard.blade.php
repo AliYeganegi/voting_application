@@ -24,12 +24,12 @@
                     @csrf
                     <div class="row g-2">
                         <div class="col-md-6">
-                            <label for="start_at" class="form-label">زمان شروع</label>
+                            <label for="start_at" class="form-label"> زمان شروع (برای شروع در همین لحظه زمان شروع را خالی بگذارید)</label>
                             <input type="datetime-local"
                                    name="start_at"
                                    id="start_at"
                                    class="form-control"
-                                   value="{{ optional($session)->start_at ? $session->start_at->format('Y-m-d\TH:i') : '' }}">
+                                   value="">
                         </div>
                         <div class="col-md-6">
                             <label for="end_at" class="form-label">زمان پایان (اختیاری)</label>
@@ -37,7 +37,7 @@
                                    name="end_at"
                                    id="end_at"
                                    class="form-control"
-                                   value="{{ optional($session)->end_at ? $session->end_at->format('Y-m-d\TH:i') : '' }}">
+                                   value="">
                         </div>
                     </div>
                     <button class="btn btn-success mt-3 w-100">

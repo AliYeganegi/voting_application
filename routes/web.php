@@ -11,8 +11,10 @@ use App\Http\Middleware\CheckVotingSession;
 
 Auth::routes();
 
-Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::middleware([CheckVotingSession::class])->group(function () {
+    Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+    Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+});
 
 
 Route::middleware(['auth', OperatorMiddleware::class, CheckVotingSession::class])->group(function () {
@@ -31,17 +33,17 @@ Route::middleware(['auth', AdminMiddleware::class])->prefix('admin')->group(func
 });
 
 Route::middleware(['auth', AdminMiddleware::class])
-     ->prefix('admin')
-     ->group(function () {
-         Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-         Route::post('/start', [AdminController::class, 'startVoting'])->name('admin.start');
-         Route::post('/stop', [AdminController::class, 'stopVoting'])->name('admin.stop');
-         Route::get('/results', [AdminController::class, 'results'])->name('admin.results');
-         Route::get('/results/pdf', [AdminController::class, 'downloadPdf'])->name('admin.results.pdf');
+    ->prefix('admin')
+    ->group(function () {
+        Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+        Route::post('/start', [AdminController::class, 'startVoting'])->name('admin.start');
+        Route::post('/stop', [AdminController::class, 'stopVoting'])->name('admin.stop');
+        Route::get('/results', [AdminController::class, 'results'])->name('admin.results');
+        Route::get('/results/pdf', [AdminController::class, 'downloadPdf'])->name('admin.results.pdf');
 
-         // Excel imports
-         Route::post('/import-voters', [VoterImportController::class, 'importVoters'])
-              ->name('admin.importVoters');
-         Route::post('/import-candidates', [VoterImportController::class, 'importCandidates'])
-              ->name('admin.importCandidates');
-     });
+        // Excel imports
+        Route::post('/import-voters', [VoterImportController::class, 'importVoters'])
+            ->name('admin.importVoters');
+        Route::post('/import-candidates', [VoterImportController::class, 'importCandidates'])
+            ->name('admin.importCandidates');
+    });

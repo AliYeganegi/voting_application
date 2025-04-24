@@ -21,7 +21,7 @@
                         </div>
                         <img src="{{ asset('storage/candidates/'.$candidate->profile_image) }}" alt="{{ $candidate->first_name }}" class="rounded-circle me-3" style="width:50px; height:50px; object-fit:cover;">
                         <div>
-                            <h5 class="mb-0">{{ $candidate->first_name }} {{ $candidate->last_name }}</h5>
+                            <h5 class="mb-0">{{ $candidate->name }}</h5>
                             <small class="text-muted">شماره پروانه: {{ $candidate->license_number }}</small>
                         </div>
                     </div>

@@ -31,6 +31,8 @@ class VoteController extends Controller
 
         return view('vote.confirm', [
             'voter_id' => $request->voter_id,
+            'first_name' => $voter->first_name,
+            'last_name' => $voter->last_name,
             'candidate' => User::find($request->candidate_id),
         ]);
     }
