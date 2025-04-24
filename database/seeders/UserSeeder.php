@@ -31,15 +31,5 @@ class UserSeeder extends Seeder
             'password' => Hash::make('password3'),
             'is_operator' => true,
         ]);
-
-        // Create sample candidates (you can add more later or seed from Excel if needed)
-        for ($i = 1; $i <= 20; $i++) {
-            User::create([
-                'name' => "Candidate $i",
-                'email' => "cand$i@example.com",
-                'password' => Hash::make('candidate'),
-                'is_candidate' => true,
-            ]);
-        }
     }
 }
