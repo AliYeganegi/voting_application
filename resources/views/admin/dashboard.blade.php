@@ -22,15 +22,27 @@
                 </div>
                 <form action="{{ route('admin.start') }}" method="POST" class="mb-3">
                     @csrf
-                    <div class="row g-2 align-items-end">
-                        <div class="col-md-8">
-                            <label for="end_at" class="form-label">زمان پایان (اختیاری):</label>
-                            <input type="datetime-local" name="end_at" id="end_at" class="form-control">
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <label for="start_at" class="form-label">زمان شروع</label>
+                            <input type="datetime-local"
+                                   name="start_at"
+                                   id="start_at"
+                                   class="form-control"
+                                   value="{{ optional($session)->start_at ? $session->start_at->format('Y-m-d\TH:i') : '' }}">
                         </div>
-                        <div class="col-md-4">
-                            <button class="btn btn-success w-100">شروع رأی‌گیری</button>
+                        <div class="col-md-6">
+                            <label for="end_at" class="form-label">زمان پایان (اختیاری)</label>
+                            <input type="datetime-local"
+                                   name="end_at"
+                                   id="end_at"
+                                   class="form-control"
+                                   value="{{ optional($session)->end_at ? $session->end_at->format('Y-m-d\TH:i') : '' }}">
                         </div>
                     </div>
+                    <button class="btn btn-success mt-3 w-100">
+                        {{ $session && $session->start_at ? 'به‌روزرسانی جلسه' : 'شروع/زمان‌بندی رأی‌گیری' }}
+                    </button>
                 </form>
                 <h5 class="mt-4">وارد کردن اطلاعات</h5>
                 <div class="row">

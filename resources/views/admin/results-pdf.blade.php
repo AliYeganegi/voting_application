@@ -19,7 +19,7 @@
         <tbody>
             @foreach($results as $cand)
                 <tr>
-                    <td>{{ $cand->first_name }} {{ $cand->last_name }}</td>
+                    <td>{{ $cand->name }}</td>
                     <td>{{ $cand->votes_count }}</td>
                 </tr>
             @endforeach

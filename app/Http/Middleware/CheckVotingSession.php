@@ -18,10 +18,12 @@ class CheckVotingSession
     {
         $session = VotingSession::where('is_active', true)->latest()->first();
 
-        if (!$session
-            || ($session->start_at && now()->lt($session->start_at))
-            || ($session->end_at && now()->gt($session->end_at))
+        if (
+            ! $session ||
+            ( $session->start_at && now()->lt($session->start_at) ) ||
+            ( $session->end_at   && now()->gt($session->end_at) )
         ) {
+            // Before start or after end → show closed page
             return redirect()->route('vote.closed');
         }
 

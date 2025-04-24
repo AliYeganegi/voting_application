@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Imports\ValidVoterImport;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\ValidVoterImport;
 use App\Imports\CandidateImport;
 use App\Models\ImportFile;
+use App\Models\ValidVoter;
+use App\Models\Vote;
+use App\Models\User;
 
 class VoterImportController extends Controller
 {
@@ -14,8 +17,12 @@ class VoterImportController extends Controller
     {
         $request->validate(['file' => 'required|file|mimes:xlsx']);
 
-        $file  = $request->file('file');
-        $path  = $file->store('imports/voters');
+        // Remove previous voters and all votes
+        ValidVoter::truncate();
+        Vote::truncate();
+
+        $file = $request->file('file');
+        $path = $file->store('imports/voters');
 
         // Run the actual import
         Excel::import(new ValidVoterImport, $file);
@@ -27,12 +34,16 @@ class VoterImportController extends Controller
             'path'          => $path,
         ]);
 
-        return back()->with('success', 'Voters imported!');
+        return back()->with('success', 'Voters imported! Previous records cleared.');
     }
 
     public function importCandidates(Request $request)
     {
         $request->validate(['file' => 'required|file|mimes:xlsx']);
+
+        // Remove previous candidates and all votes
+        User::where('is_candidate', true)->delete();
+        Vote::truncate();
 
         $file = $request->file('file');
         $path = $file->store('imports/candidates');
@@ -45,7 +56,6 @@ class VoterImportController extends Controller
             'path'          => $path,
         ]);
 
-        return back()->with('success', 'Candidates imported!');
+        return back()->with('success', 'Candidates imported! Previous records cleared.');
     }
-
 }

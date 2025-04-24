@@ -27,14 +27,35 @@ class AdminController extends Controller
         ));
     }
 
-    public function startVoting()
+    public function startVoting(Request $request)
     {
-        VotingSession::create([
-            'start_at' => now(),
-            'is_active' => true,
+        $data = $request->validate([
+            'start_at' => 'nullable|date',
+            'end_at'   => 'nullable|date|after:start_at',
         ]);
 
-        return back()->with('success', 'Voting started');
+        // Decide the real start time:
+        $start = $data['start_at']
+            ? \Carbon\Carbon::parse($data['start_at'])
+            : now();
+
+        // Update the existing session if present, or create new:
+        $session = VotingSession::latest()->first();
+        if ($session) {
+            $session->update([
+                'start_at'  => $start,
+                'end_at'    => $data['end_at'] ?? null,
+                'is_active' => true,  // will be checked with times below
+            ]);
+        } else {
+            VotingSession::create([
+                'start_at'  => $start,
+                'end_at'    => $data['end_at'] ?? null,
+                'is_active' => true,
+            ]);
+        }
+
+        return back()->with('success', 'Voting session scheduled.');
     }
 
     public function endVoting()
