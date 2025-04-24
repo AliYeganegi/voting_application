@@ -31,5 +31,13 @@ class UserSeeder extends Seeder
             'password' => Hash::make('password3'),
             'is_operator' => true,
         ]);
+
+        User::create([
+            'name' => 'admin',
+            'email' => 'admin@example.com',
+            'password' => Hash::make('admin'),
+            'is_operator' => true,
+            'is_admin' => true,
+        ]);
     }
 }

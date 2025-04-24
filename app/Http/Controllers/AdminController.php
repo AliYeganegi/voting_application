@@ -17,11 +17,13 @@ class AdminController extends Controller
     public function dashboard()
     {
         $session          = VotingSession::latest()->first();
-        $lastVoterFile    = ImportFile::where('type','voters')->latest()->first();
-        $lastCandidateFile= ImportFile::where('type','candidates')->latest()->first();
+        $lastVoterFile    = ImportFile::where('type', 'voters')->latest()->first();
+        $lastCandidateFile = ImportFile::where('type', 'candidates')->latest()->first();
 
         return view('admin.dashboard', compact(
-            'session', 'lastVoterFile', 'lastCandidateFile'
+            'session',
+            'lastVoterFile',
+            'lastCandidateFile'
         ));
     }
 
@@ -61,12 +63,24 @@ class AdminController extends Controller
     {
         $session = VotingSession::latest()->first();
 
-        // Block if still active
-        if ($session->is_active || ($session->end_at && now()->lt($session->end_at))) {
-            return back()->withErrors(['error' => 'Results are only available after voting ends.']);
+        // 0) If no session exists, tell the admin
+        if (! $session) {
+            return back()->withErrors([
+                'error' => 'هنوز جلسه رأی‌گیری ایجاد نشده است.'
+            ]);
         }
 
-        // Aggregate vote counts
+        // 1) Block if still active or not yet ended
+        if (
+            $session->is_active
+            || ($session->end_at && now()->lt($session->end_at))
+        ) {
+            return back()->withErrors([
+                'error' => 'نتایج تنها پس از پایان رأی‌گیری قابل مشاهده هستند.'
+            ]);
+        }
+
+        // 2) Aggregate vote counts
         $results = User::where('is_candidate', true)
             ->withCount(['votes as votes_count' => function ($q) {
                 $q->select(DB::raw("count(*)"));
@@ -74,6 +88,7 @@ class AdminController extends Controller
             ->orderByDesc('votes_count')
             ->get();
 
+        // 3) Show the results
         return view('admin.results', compact('results'));
     }
 

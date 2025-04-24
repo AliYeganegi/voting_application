@@ -30,22 +30,18 @@ Route::middleware(['auth', AdminMiddleware::class])->prefix('admin')->group(func
     Route::get('/export', [AdminController::class, 'exportResults'])->name('admin.export');
 });
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('/admin', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-    Route::post('/admin/start', [AdminController::class, 'startVoting'])->name('admin.start');
-    Route::post('/admin/stop', [AdminController::class, 'stopVoting'])->name('admin.stop');
-});
+Route::middleware(['auth', AdminMiddleware::class])
+     ->prefix('admin')
+     ->group(function () {
+         Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+         Route::post('/start', [AdminController::class, 'startVoting'])->name('admin.start');
+         Route::post('/stop', [AdminController::class, 'stopVoting'])->name('admin.stop');
+         Route::get('/results', [AdminController::class, 'results'])->name('admin.results');
+         Route::get('/results/pdf', [AdminController::class, 'downloadPdf'])->name('admin.results.pdf');
 
-Route::post('/admin/import-voters', [VoterImportController::class, 'importVoters'])
-     ->name('admin.importVoters')
-     ->middleware('auth');
-
-Route::post('/admin/import-candidates', [VoterImportController::class, 'importCandidates'])
-     ->name('admin.importCandidates')->middleware('auth');
-
-// Show HTML results
-Route::get('/admin/results', [AdminController::class, 'results'])->name('admin.results');
-
-// Download PDF
-Route::get('/admin/results/pdf', [AdminController::class, 'downloadPdf'])->name('admin.results.pdf');
-
+         // Excel imports
+         Route::post('/import-voters', [VoterImportController::class, 'importVoters'])
+              ->name('admin.importVoters');
+         Route::post('/import-candidates', [VoterImportController::class, 'importCandidates'])
+              ->name('admin.importCandidates');
+     });
