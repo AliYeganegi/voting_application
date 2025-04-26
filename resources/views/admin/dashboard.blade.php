@@ -1,94 +1,97 @@
 @extends('layouts.app')
 @section('content')
-    <div class="container">
-        <h1 class="mb-4 text-center">پنل مدیریت - جلسه رأی‌گیری</h1>
-        @if (session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
-        @endif
-        <div class="bg-white p-4 rounded shadow-sm mb-4">
-            @if ($session && $session->is_active)
-                <div class="alert alert-info text-center">
-                    <h4>رأی‌گیری در حال انجام است</h4>
-                    <p>شروع: {{ $session->start_at->format('Y-m-d H:i') }}</p>
-                    <p>پایان: {{ $session->end_at ? $session->end_at->format('Y-m-d H:i') : 'تعریف نشده' }}</p>
-                </div>
-                <form action="{{ route('admin.stop') }}" method="POST" class="text-center">
-                    @csrf
-                    <button class="btn btn-danger">پایان رأی‌گیری</button>
-                </form>
-            @else
-                <div class="alert alert-warning text-center">
-                    <h4>رأی‌گیری فعال نیست</h4>
-                </div>
-                <form action="{{ route('admin.start') }}" method="POST" class="mb-3">
-                    @csrf
-                    <div class="row g-2">
-                        <div class="col-md-6">
-                            <label for="start_at" class="form-label"> زمان شروع (برای شروع در همین لحظه زمان شروع را خالی بگذارید)</label>
-                            <input type="datetime-local"
-                                   name="start_at"
-                                   id="start_at"
-                                   class="form-control"
-                                   value="">
-                        </div>
-                        <div class="col-md-6">
-                            <label for="end_at" class="form-label">زمان پایان (اختیاری)</label>
-                            <input type="datetime-local"
-                                   name="end_at"
-                                   id="end_at"
-                                   class="form-control"
-                                   value="">
-                        </div>
-                    </div>
-                    <button class="btn btn-success mt-3 w-100">
-                        {{ $session && $session->start_at ? 'به‌روزرسانی جلسه' : 'شروع/زمان‌بندی رأی‌گیری' }}
-                    </button>
-                </form>
-                <h5 class="mt-4">وارد کردن اطلاعات</h5>
-                <div class="row">
-                    <div class="mb-2">
-                        @if ($lastVoterFile)
-                            <small class="text-muted">
-                                آخرین فایل رأی‌دهندگان:
-                                {{ $lastVoterFile->original_name }}
-                                ({{ $lastVoterFile->created_at->format('Y-m-d H:i') }})
-                            </small>
-                        @endif
-                        <form action="{{ route('admin.importVoters') }}" …>
-                            {{-- your file input --}}
-                        </form>
-                    </div>
-                    <div class="col-md-6">
-                        <form action="{{ route('admin.importVoters') }}" method="POST" enctype="multipart/form-data">
-                            @csrf
-                            <label>فایل اکسل رأی‌دهندگان</label>
-                            <input type="file" name="file" class="form-control mb-2" required>
-                            <button class="btn btn-primary w-100">وارد کردن رأی‌دهندگان</button>
-                        </form>
+<div class="container">
+    <h1 class="mb-4 text-center">پنل مدیریت - جلسه رأی‌گیری</h1>
+    @if (session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
 
-                    </div>
-                    <div class="mb-2">
-                        @if ($lastCandidateFile)
-                            <small class="text-muted">
-                                آخرین فایل نامزدها:
-                                {{ $lastCandidateFile->original_name }}
-                                ({{ $lastCandidateFile->created_at->format('Y-m-d H:i') }})
-                            </small>
-                        @endif
-                        <form action="{{ route('admin.importCandidates') }}" …>
-                            {{-- your file input --}}
-                        </form>
+    <div class="bg-white p-4 rounded shadow-sm mb-4">
+        @if ($session && $session->is_active)
+            <div class="alert alert-info text-center">
+                <h4>رأی‌گیری در حال انجام است</h4>
+                <p>شروع: {{ $session->start_at->format('Y-m-d H:i') }}</p>
+                <p>پایان: {{ $session->end_at ? $session->end_at->format('Y-m-d H:i') : 'تعریف نشده' }}</p>
+            </div>
+            <form action="{{ route('admin.endVoting') }}" method="POST" class="text-center">
+                @csrf
+                <button class="btn btn-danger">پایان رأی‌گیری</button>
+            </form>
+
+        @else
+            <div class="alert alert-warning text-center">
+                <h4>رأی‌گیری فعال نیست</h4>
+            </div>
+            <form action="{{ route('admin.start') }}" method="POST" class="mb-3">
+                @csrf
+                <div class="row g-2">
+                    <div class="col-md-6">
+                        <label for="start_at" class="form-label">زمان شروع
+                            <small class="text-muted d-block">برای شروع در همین لحظه آن را خالی بگذارید.</small>
+                        </label>
+                        <input type="datetime-local" name="start_at" id="start_at" class="form-control" value="{{ optional($session)->start_at ? $session->start_at->format('Y-m-d\TH:i') : '' }}">
                     </div>
                     <div class="col-md-6">
-                        <form action="{{ route('admin.importCandidates') }}" method="POST" enctype="multipart/form-data">
-                            @csrf
-                            <label class="form-label">فایل اکسل نامزدها</label>
-                            <input type="file" name="file" class="form-control mb-2" required>
-                            <button class="btn btn-primary w-100">وارد کردن نامزدها</button>
-                        </form>
+                        <label for="end_at" class="form-label">زمان پایان (اختیاری)
+                            <small class="text-muted d-block">برای بی‌نهایت رها کنید.</small>
+                        </label>
+                        <input type="datetime-local" name="end_at" id="end_at" class="form-control" value="{{ optional($session)->end_at ? $session->end_at->format('Y-m-d\TH:i') : '' }}">
                     </div>
                 </div>
-            @endif
-        </div>
+                <button class="btn btn-success mt-3 w-100">
+                    {{ $session && $session->start_at ? 'به‌روزرسانی جلسه' : 'شروع/زمان‌بندی رأی‌گیری' }}
+                </button>
+            </form>
+
+            <h5 class="mt-4">وارد کردن اطلاعات</h5>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    @if ($lastVoterFile)
+                        <small class="text-muted d-block">
+                            آخرین فایل رأی‌دهندگان: {{ $lastVoterFile->original_name }}
+                            ({{ $lastVoterFile->created_at->format('Y-m-d H:i') }})
+                        </small>
+                    @endif
+                    <form action="{{ route('admin.importVoters') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <label class="form-label">فایل اکسل رأی‌دهندگان</label>
+                        <input type="file" name="file" class="form-control mb-2" required>
+                        <button class="btn btn-primary w-100">وارد کردن رأی‌دهندگان</button>
+                    </form>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    @if ($lastCandidateFile)
+                        <small class="text-muted d-block">
+                            آخرین فایل نامزدها: {{ $lastCandidateFile->original_name }}
+                            ({{ $lastCandidateFile->created_at->format('Y-m-d H:i') }})
+                        </small>
+                    @endif
+                    <form action="{{ route('admin.importCandidates') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <label class="form-label">فایل اکسل نامزدها</label>
+                        <input type="file" name="file" class="form-control mb-2" required>
+                        <button class="btn btn-primary w-100">وارد کردن نامزدها</button>
+                    </form>
+                </div>
+            </div>
+        @endif
+
+        @if ($previousSessions->count())
+            <h3 class="mt-5">نتایج رأی‌گیری‌های قبلی</h3>
+            <ul class="list-group">
+                @foreach ($previousSessions as $sess)
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>جلسه از {{ $sess->start_at->format('Y-m-d H:i') }}</div>
+                        <div class="btn-group">
+                            <a href="{{ route('admin.sessions.results', $sess->id) }}" class="btn btn-outline-primary btn-sm">مشاهده</a>
+                            <a href="{{ route('admin.sessions.results.pdf', $sess->id) }}" class="btn btn-primary btn-sm">دانلود PDF</a>
+                        </div>
+                    </li>
+                @endforeach
+            </ul>
+        @endif
+
     </div>
+</div>
 @endsection

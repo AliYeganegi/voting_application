@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\ValidVoter;
 use App\Models\Vote;
+use App\Models\VotingSession;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -40,7 +41,7 @@ class VoteController extends Controller
     public function submit(Request $request)
     {
         $request->validate([
-            'voter_id' => 'required',
+            'voter_id'     => 'required',
             'candidate_id' => 'required|exists:users,id',
         ]);
 
@@ -50,11 +51,19 @@ class VoteController extends Controller
             return back()->withErrors(['voter_id' => 'Invalid or already voted']);
         }
 
+        // find the current active session
+        $session = VotingSession::where('is_active', true)
+                    ->latest()
+                    ->firstOrFail();
+
+        // record the vote in that session
         Vote::create([
-            'hashed_voter_id' => Hash::make($request->voter_id),
-            'candidate_id' => $request->candidate_id,
+            'hashed_voter_id'   => Hash::make($request->voter_id),
+            'candidate_id'      => $request->candidate_id,
+            'voting_session_id' => $session->id,
         ]);
 
+        // mark voter as having voted
         $voter->update(['has_voted' => true]);
 
         return redirect()->route('vote.index')->with('success', 'Vote submitted!');
