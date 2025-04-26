@@ -9,7 +9,15 @@
             <dt class="col-sm-3">نام رای دهنده:</dt>
             <dd class="col-sm-9">{{ $first_name }} {{ $last_name }}</dd>
             <dt class="col-sm-3">نامزد انتخابی:</dt>
-            <dd class="col-sm-9">{{ $candidate->name }}</dd>
+            <dd class="col-sm-9">
+                @if ($candidate->profile_image)
+                    <img src="{{ asset('storage/candidates/' . $candidate->profile_image) }}"
+                         alt="تصویر نامزد"
+                         class="img-thumbnail mb-2"
+                         style="max-width: 150px;">
+                @endif
+                <div>{{ $candidate->name }}</div>
+            </dd>
         </dl>
         <form method="POST" action="{{ route('vote.submit') }}">
             @csrf
