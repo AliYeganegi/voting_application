@@ -56,14 +56,14 @@ class AdminController extends Controller
             'is_active' => true,
         ]);
 
-        return back()->with('success', 'Voting session scheduled.');
+        return back()->with('success', 'زمان رای گیری ثبت شد');
     }
 
     public function endVoting()
     {
         $session = VotingSession::where('is_active', true)->latest()->first();
         if (! $session) {
-            return back()->withErrors(['error' => 'No active session to end.']);
+            return back()->withErrors(['error' => 'رای گیری فعالی یافت نشد']);
         }
 
         $session->update(['is_active' => false, 'end_at' => now()]);
@@ -81,7 +81,7 @@ class AdminController extends Controller
         Storage::put('public/' . $filePath, $pdf->output());
         $session->update(['result_file' => $filePath]);
 
-        return back()->with('success', 'Voting ended and PDF generated.');
+        return back()->with('success', 'رای گیری پایان یافت و فایل نتایج ایجاد شد.');
     }
 
 
@@ -90,7 +90,7 @@ class AdminController extends Controller
         $session = VotingSession::latest()->first();
 
         if ($session->is_active) {
-            return back()->withErrors(['error' => 'Voting is still active. Export is allowed after ending.']);
+            return back()->withErrors(['error' => 'رای گیری در حال اجراست گرفتن خروجی پس از اتمام رای گیری ممکن است']);
         }
 
         return Excel::download(new VoteExport, 'voting_results.xlsx');
@@ -132,7 +132,7 @@ class AdminController extends Controller
             ]);
         }
 
-        return redirect()->back()->with('success', 'Voting ended.');
+        return redirect()->back()->with('success', 'رای گیری به پایان رسید');
     }
 
     public function previousSessions()

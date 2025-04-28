@@ -26,8 +26,12 @@ class VoteController extends Controller
 
         $voter = ValidVoter::where('voter_id', $request->voter_id)->first();
 
-        if (!$voter || $voter->has_voted) {
-            return back()->withErrors(['voter_id' => 'Invalid or already voted']);
+        if (!$voter) {
+            return back()->withErrors(['voter_id' => 'کد ملی یافت نشد!']);
+        }
+
+        if ($voter->has_voted) {
+            return back()->withErrors(['voter_id' => 'رای با این کد ملی ثبت شده است!']);
         }
 
         return view('vote.confirm', [
@@ -47,8 +51,12 @@ class VoteController extends Controller
 
         $voter = ValidVoter::where('voter_id', $request->voter_id)->first();
 
-        if (!$voter || $voter->has_voted) {
-            return back()->withErrors(['voter_id' => 'Invalid or already voted']);
+        if (!$voter) {
+            return back()->withErrors(['voter_id' => 'شماره ملی یافت نشد!']);
+        }
+
+        if ($voter->has_voted) {
+            return back()->withErrors(['voter_id' => 'رای با این شماره ملی ثبت شده است!']);
         }
 
         // find the current active session
@@ -66,6 +74,6 @@ class VoteController extends Controller
         // mark voter as having voted
         $voter->update(['has_voted' => true]);
 
-        return redirect()->route('vote.index')->with('success', 'Vote submitted!');
+        return redirect()->route('vote.index')->with('success', 'رای ثبت شد!');
     }
 }

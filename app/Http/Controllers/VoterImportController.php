@@ -34,7 +34,7 @@ class VoterImportController extends Controller
             'path'          => $path,
         ]);
 
-        return back()->with('success', 'Voters imported! Previous records cleared.');
+        return back()->with('success', 'اطلاعات رای دهندگان ثبت شد. اطلاعات قبلی پاک شدند.');
     }
 
     public function importCandidates(Request $request)
@@ -56,6 +56,6 @@ class VoterImportController extends Controller
             'path'          => $path,
         ]);
 
-        return back()->with('success', 'Candidates imported! Previous records cleared.');
+        return back()->with('success', 'اطلاعات نامزد ها ثبت شد. اطلاعات قبلی پاک شدند.');
     }
 }

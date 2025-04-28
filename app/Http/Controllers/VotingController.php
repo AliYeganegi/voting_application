@@ -24,7 +24,7 @@ class VotingController extends Controller
 
         // Prevent double voting
         if (Vote::where('hashed_voter_id', $hashedId)->exists()) {
-            return redirect()->back()->withErrors(['voter_id' => 'This ID has already voted.']);
+            return redirect()->back()->withErrors(['voter_id' => 'رای با این شماره ملی ثبت شده است.']);
         }
 
         Vote::create([

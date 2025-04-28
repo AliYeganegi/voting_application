@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\VoteController;
 use App\Http\Controllers\VoterImportController;
+use App\Http\Controllers\VotingSessionController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\AdminMiddleware;
@@ -33,6 +34,7 @@ Route::middleware(['auth', AdminMiddleware::class])->prefix('admin')->group(func
     Route::get('/sessions', [AdminController::class, 'previousSessions'])->name('admin.sessions');
     Route::get('/sessions/{session}/results', [AdminController::class, 'results'])->name('admin.sessions.results');
     Route::get('/sessions/{session}/results/pdf', [AdminController::class, 'downloadResultPdf'])->name('admin.sessions.results.pdf');
+    Route::delete('/sessions/{session}', [VotingSessionController::class, 'destroy'])->name('admin.sessions.destroy');
 
 });
 

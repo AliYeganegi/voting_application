@@ -33,7 +33,7 @@
                     </div>
                     <div class="col-md-6">
                         <label for="end_at" class="form-label">زمان پایان (اختیاری)
-                            <small class="text-muted d-block">برای بی‌نهایت رها کنید.</small>
+                            <small class="text-muted d-block">برای پایان به صورت دستی آن را خالی بگذارید.</small>
                         </label>
                         <input type="datetime-local" name="end_at" id="end_at" class="form-control" value="{{ optional($session)->end_at ? $session->end_at->format('Y-m-d\TH:i') : '' }}">
                     </div>
