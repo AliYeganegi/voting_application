@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Ballot;
 use App\Models\User;
 use App\Models\ValidVoter;
+use App\Models\Verification;
 use App\Models\Vote;
 use App\Models\VotingSession;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class VoteController extends Controller
@@ -19,61 +22,111 @@ class VoteController extends Controller
 
     public function confirm(Request $request)
     {
-        $request->validate([
-            'voter_id' => 'required',
-            'candidate_id' => 'required|exists:users,id',
+        // If they arrived via GET (after a validation redirect), just show the form
+        if ($request->isMethod('get')) {
+            return $this->index();
+        }
+
+        // Otherwise it’s a POST—continue with your validation & confirm logic…
+        $data = $request->validate([
+            'voter_id'        => 'required|string',
+            'candidate_ids'   => 'nullable|array|max:5',
+            'candidate_ids.*' => 'exists:users,id',
+        ], [
+            'candidate_ids.max'      => 'شما نمی‌توانید بیش از ۵ نامزد انتخاب کنید.',
+            'candidate_ids.*.exists' => 'نامزد انتخاب‌شده نامعتبر است.',
         ]);
 
-        $voter = ValidVoter::where('voter_id', $request->voter_id)->first();
-
-        if (!$voter) {
-            return back()->withErrors(['voter_id' => 'کد ملی یافت نشد!']);
+        // Lookup voter
+        $voter = ValidVoter::where('voter_id', $data['voter_id'])->first();
+        if (! $voter) {
+            return back()->withErrors(['voter_id' => 'کد ملی نامعتبر است.']);
         }
 
-        if ($voter->has_voted) {
-            return back()->withErrors(['voter_id' => 'رای با این کد ملی ثبت شده است!']);
-        }
+        // Load selected candidates
+        $selectedIds = $data['candidate_ids'] ?? [];
+        $candidates  = User::whereIn('id', $selectedIds)->get();
 
         return view('vote.confirm', [
-            'voter_id' => $request->voter_id,
+            'voter_id'   => $data['voter_id'],
             'first_name' => $voter->first_name,
-            'last_name' => $voter->last_name,
-            'candidate' => User::find($request->candidate_id),
+            'last_name'  => $voter->last_name,
+            'candidates' => $candidates,
         ]);
     }
 
+
     public function submit(Request $request)
     {
-        $request->validate([
-            'voter_id'     => 'required',
-            'candidate_id' => 'required|exists:users,id',
+        // 1) Validate input
+        $data = $request->validate([
+            'voter_id'        => 'required|string',
+            'candidate_ids'   => 'nullable|array|max:5',
+            'candidate_ids.*' => 'exists:users,id',
+        ], [
+            'candidate_ids.max'      => 'شما نمی‌توانید بیش از ۵ نامزد انتخاب کنید.',
+            'candidate_ids.*.exists' => 'یک یا چند نامزد انتخاب‌شده نامعتبرند.',
         ]);
 
-        $voter = ValidVoter::where('voter_id', $request->voter_id)->first();
-
-        if (!$voter) {
-            return back()->withErrors(['voter_id' => 'شماره ملی یافت نشد!']);
+        // 2) Lookup voter
+        $voter = ValidVoter::where('voter_id', $data['voter_id'])->first();
+        if (! $voter) {
+            return back()->withErrors(['voter_id' => 'کد ملی نامعتبر است.']);
         }
 
-        if ($voter->has_voted) {
-            return back()->withErrors(['voter_id' => 'رای با این شماره ملی ثبت شده است!']);
-        }
-
-        // find the current active session
+        // 3) Get active session
         $session = VotingSession::where('is_active', true)
                     ->latest()
                     ->firstOrFail();
 
-        // record the vote in that session
-        Vote::create([
-            'hashed_voter_id'   => Hash::make($request->voter_id),
-            'candidate_id'      => $request->candidate_id,
-            'voting_session_id' => $session->id,
-        ]);
+        // 4) Compute stable hash
+        $voterHash = hash('sha256', $data['voter_id']);
 
-        // mark voter as having voted
-        $voter->update(['has_voted' => true]);
+        // 5) Count existing votes this hash has in this session
+        $alreadyCast = Vote::where('voting_session_id', $session->id)
+                           ->where('hashed_voter_id', $voterHash)
+                           ->count();
 
-        return redirect()->route('vote.index')->with('success', 'رای ثبت شد!');
+        // 6) Determine new vote usage (blank counts as 1)
+        $countSelected = count($data['candidate_ids'] ?? []);
+        $newVotes      = $countSelected > 0 ? $countSelected : 1;
+
+        if ($alreadyCast + $newVotes > 5) {
+            return back()->withErrors([
+                'candidate_ids' => "شما تا کنون {$alreadyCast} رأی ثبت کرده‌اید؛ نمی‌توانید بیش از ۵ رأی داشته باشید."
+            ]);
+        }
+
+        // 7) Record within a transaction
+        DB::transaction(function() use ($session, $voterHash, $data) {
+            // a) Create individual Vote rows
+            foreach ($data['candidate_ids'] ?? [] as $candidateId) {
+                Vote::create([
+                    'hashed_voter_id'   => $voterHash,
+                    'candidate_id'      => $candidateId,
+                    'voting_session_id' => $session->id,
+                ]);
+            }
+
+            // b) Create or update the Ballot and sync candidates
+            $ballot = Ballot::updateOrCreate(
+                [
+                    'voting_session_id' => $session->id,
+                    'voter_hash'        => $voterHash,
+                ],
+                []
+            );
+            $ballot->candidates()->sync($data['candidate_ids'] ?? []);
+
+            // c) Mark this verification as used
+            Verification::where('voting_session_id', $session->id)
+                ->where('voter_hash', $voterHash)
+                ->where('status', 'pending')
+                ->update(['status' => 'used']);
+        });
+
+        // 8) Redirect with success
+        return redirect()->route('vote.index')
+                         ->with('success', 'رأی‌های شما با موفقیت ثبت شدند.');
     }
 }

@@ -31,9 +31,11 @@
                     <tr>
                         <td>{{ $sess->id }}</td>
                         <td>{{ $sess->start_at->format('Y-m-d H:i') }}</td>
-                        <td>{{ $sess->end_at
+                        <td>
+                            {{ $sess->end_at
                                 ? $sess->end_at->format('Y-m-d H:i')
-                                : 'تعریف نشده' }}</td>
+                                : 'تعریف نشده' }}
+                        </td>
                         <td>
                             @if($sess->is_active)
                                 <span class="badge bg-info">در حال اجرا</span>
@@ -43,17 +45,27 @@
                         </td>
                         <td class="d-flex gap-1">
                             @if(!$sess->is_active)
+                                {{-- View results --}}
                                 <a href="{{ route('admin.sessions.results', $sess->id) }}"
                                    class="btn btn-sm btn-success">
                                     مشاهده نتایج
                                 </a>
+
+                                {{-- Download PDF --}}
                                 @if($sess->result_file)
                                     <a href="{{ route('admin.sessions.results.pdf', $sess->id) }}"
                                        class="btn btn-sm btn-primary">
                                         دانلود PDF
                                     </a>
                                 @endif
-                                {{-- Delete button --}}
+
+                                {{-- View Ballots --}}
+                                <a href="{{ route('admin.sessions.ballots', $sess->id) }}"
+                                   class="btn btn-sm btn-warning">
+                                    مشاهده برگ‌های رأی
+                                </a>
+
+                                {{-- Delete session --}}
                                 <form action="{{ route('admin.sessions.destroy', $sess->id) }}"
                                       method="POST"
                                       onsubmit="return confirm('آیا مطمئن به حذف این جلسه هستید؟');">

@@ -18,8 +18,15 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name','email','password',
-        'national_id','license_number','profile_image','is_candidate','is_operator'
+        'name',
+        'email',
+        'password',
+        'national_id',
+        'license_number',
+        'profile_image',
+        'is_candidate',
+        'is_operator',
+        'is_verifier'
     ];
 
 
@@ -49,5 +56,10 @@ class User extends Authenticatable
     public function votes()
     {
         return $this->hasMany(\App\Models\Vote::class, 'candidate_id');
+    }
+
+    public function verifier()
+    {
+        return $this->hasOne(Verifier::class);
     }
 }

@@ -8,6 +8,7 @@ use App\Models\Vote;
 use App\Models\User;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\VoteExport;
+use App\Models\Ballot;
 use App\Models\ImportFile;
 use App\Models\ValidVoter;
 use Illuminate\Support\Facades\DB;
@@ -139,5 +140,20 @@ class AdminController extends Controller
     {
         $sessions = VotingSession::where('is_active', false)->orderBy('start_at', 'desc')->get();
         return view('admin.sessions', compact('sessions'));
+    }
+
+    public function viewBallots(VotingSession $session)
+    {
+        // only ended sessions:
+        if ($session->is_active || ($session->end_at && now()->lt($session->end_at))) {
+            return back()->withErrors(['error' => 'Ballots visible only after session ends.']);
+        }
+
+        // load ballots with candidates
+        $ballots = Ballot::with('candidates')
+            ->where('voting_session_id', $session->id)
+            ->get();
+
+        return view('admin.ballots', compact('session', 'ballots'));
     }
 }

@@ -30,8 +30,8 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <!-- Right side (RTL) -->
                     <ul class="navbar-nav me-auto">
-                        <!-- Voting link (operators) -->
                         @auth
+                            {{-- Phase 1: Voting (operators) --}}
                             @if(auth()->user()->is_operator)
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('vote.index') }}">
@@ -39,10 +39,17 @@
                                     </a>
                                 </li>
                             @endif
-                        @endauth
 
-                        <!-- Admin links -->
-                        @auth
+                            {{-- Phase 4: Verification queue (verifiers) --}}
+                            @if(auth()->user()->is_verifier)
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('verify.index') }}">
+                                        صف تأیید
+                                    </a>
+                                </li>
+                            @endif
+
+                            {{-- Phase 2 & 4: Admin area --}}
                             @if(auth()->user()->is_admin)
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('admin.dashboard') }}">
@@ -52,6 +59,12 @@
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('admin.sessions') }}">
                                         نتایج جلسات
+                                    </a>
+                                </li>
+                                {{-- Phase 3: User management --}}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('users.index') }}">
+                                        مدیریت کاربران
                                     </a>
                                 </li>
                             @endif
