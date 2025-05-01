@@ -77,21 +77,6 @@
             </div>
         @endif
 
-        @if ($previousSessions->count())
-            <h3 class="mt-5">نتایج رأی‌گیری‌های قبلی</h3>
-            <ul class="list-group">
-                @foreach ($previousSessions as $sess)
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <div>جلسه از {{ $sess->start_at->format('Y-m-d H:i') }}</div>
-                        <div class="btn-group">
-                            <a href="{{ route('admin.sessions.results', $sess->id) }}" class="btn btn-outline-primary btn-sm">مشاهده</a>
-                            <a href="{{ route('admin.sessions.results.pdf', $sess->id) }}" class="btn btn-primary btn-sm">دانلود PDF</a>
-                        </div>
-                    </li>
-                @endforeach
-            </ul>
-        @endif
-
     </div>
 </div>
 @endsection

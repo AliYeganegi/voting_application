@@ -74,3 +74,8 @@ Route::middleware(['auth', AdminMiddleware::class])
         Route::post('/import-candidates', [VoterImportController::class, 'importCandidates'])
             ->name('admin.importCandidates');
     });
+
+Route::post('/notifications/read-all', function () {
+    auth()->user()->unreadNotifications->markAsRead();
+    return back();
+})->name('notifications.read');

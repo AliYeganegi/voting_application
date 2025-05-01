@@ -68,6 +68,43 @@
                                     </a>
                                 </li>
                             @endif
+                            @php $unreads = auth()->user()->unreadNotifications; @endphp
+
+                            <li class="nav-item dropdown">
+                              <a class="nav-link position-relative dropdown-toggle"
+                                 href="#" role="button"
+                                 data-bs-toggle="dropdown">
+                                🔔
+                                @if($unreads->count())
+                                  <span class="badge bg-danger position-absolute top-0 start-100 translate-middle">
+                                    {{ $unreads->count() }}
+                                  </span>
+                                @endif
+                              </a>
+                              <ul class="dropdown-menu dropdown-menu-end">
+                                @forelse($unreads as $note)
+                                  <li>
+                                    <a class="dropdown-item" href="#">
+                                      {{ $note->data['message'] }}
+                                      <br><small class="text-muted">
+                                        {{ $note->created_at->diffForHumans() }}
+                                      </small>
+                                    </a>
+                                  </li>
+                                @empty
+                                  <li class="dropdown-item text-center text-muted">
+                                    اعلان جدیدی نیست
+                                  </li>
+                                @endforelse
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                  <form method="POST" action="{{ route('notifications.read') }}">
+                                    @csrf
+                                    <button class="dropdown-item text-center">علامت‌گذاری همه به‌عنوان خوانده‌شده</button>
+                                  </form>
+                                </li>
+                              </ul>
+                            </li>
                         @endauth
                     </ul>
 
