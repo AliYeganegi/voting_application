@@ -72,7 +72,7 @@
 
           {{-- —— اپراتورها تأیید شروع —— --}}
           <div class="border rounded p-3 mb-3">
-            <h5>تأیید شروع رأی‌گیری توسط اپراتورها</h5>
+            {{-- <h5>تأیید شروع رأی‌گیری توسط اپراتورها</h5>
             <p><strong>{{ $startApps->count() }} / 3</strong> اپراتور تأیید کرده‌اند</p>
             <ul class="mb-3">
               @foreach($startApps as $app)
@@ -91,7 +91,7 @@
                       : 'تأیید شروع' }}
                 </button>
               </form>
-            @endif
+            @endif --}}
 
             @if(auth()->user()->is_admin)
               <form action="{{ route('admin.start') }}" method="POST" class="mt-2">

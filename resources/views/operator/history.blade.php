@@ -30,14 +30,6 @@
                         <li class="text-muted">بدون تأیید</li>
                     @endforelse
                 </ul>
-
-                @if ($session->result_file)
-                    <p class="mt-3">
-                        <a href="{{ asset('storage/' . $session->result_file) }}" target="_blank" class="btn btn-sm btn-outline-secondary">
-                            دانلود فایل نتایج
-                        </a>
-                    </p>
-                @endif
             </div>
         </div>
     @empty
