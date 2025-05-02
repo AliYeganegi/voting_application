@@ -33,15 +33,22 @@ class UserManagementController extends Controller
             'name'        => 'required|string|max:255',
             'email'       => 'required|email|unique:users,email',
             'password'    => 'required|string|min:8|confirmed',
-            'is_operator' => 'boolean',
-            'is_verifier' => 'boolean',
+            'is_operator' => '',
+            'is_verifier' => '',
         ]);
+
+        $data['is_operator'] = $request->has('is_operator') ? 1 : 0;
+        $data['is_verifier'] = $request->has('is_verifier') ? 1 : 0;
 
         $data['password'] = Hash::make($data['password']);
 
         User::create($data);
 
-        return redirect()->route('admin.users.index')
+        $users = User::where('is_admin', false)
+        ->orderBy('name')
+        ->paginate(20);
+
+        return view('admin.users.index', compact('users'))
                          ->with('success', 'کاربر با موفقیت ایجاد شد.');
     }
 

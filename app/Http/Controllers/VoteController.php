@@ -19,7 +19,11 @@ class VoteController extends Controller
     public function index()
     {
         $candidates = User::where('is_candidate', true)->get();
-        return view('vote.index', compact('candidates'));
+        $session = VotingSession::where('is_active', true)
+        ->latest()
+        ->firstOrFail();
+
+        return view('vote.index', compact('candidates', 'session'));
     }
 
     public function confirm(Request $request)

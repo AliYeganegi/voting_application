@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\VotingSession;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -24,7 +25,11 @@ class HomeController extends Controller
      */
     public function index()
     {
+        $session =  $session = VotingSession::where('is_active', true)
+        ->latest()
+        ->first();
         $candidates = User::where('is_candidate', true)->get();
-        return view('vote.index', compact('candidates'));
+
+        return view('vote.index', compact('candidates', 'session'));
     }
 }

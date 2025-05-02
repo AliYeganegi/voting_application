@@ -10,54 +10,118 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\VoteExport;
 use App\Models\Ballot;
 use App\Models\ImportFile;
+use App\Models\OperatorApproval;
 use App\Models\ValidVoter;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
     public function dashboard()
     {
-        $session          = VotingSession::latest()->first();
-        $lastVoterFile    = ImportFile::where('type', 'voters')->latest()->first();
+        $session           = VotingSession::latest()->first();
+        $lastVoterFile     = ImportFile::where('type', 'voters')->latest()->first();
         $lastCandidateFile = ImportFile::where('type', 'candidates')->latest()->first();
-        $previousSessions = VotingSession::where('is_active', false)->orderBy('start_at', 'desc')->get();
+        $previousSessions  = VotingSession::where('is_active', false)
+            ->orderBy('start_at', 'desc')
+            ->get();
+
+        // load approvals so far
+        $startApps = $session
+            ? $session->startApprovals()->with('operator')->get()
+            : collect();
+        $endApps   = $session
+            ? $session->endApprovals()->with('operator')->get()
+            : collect();
 
         return view('admin.dashboard', compact(
             'session',
             'lastVoterFile',
             'lastCandidateFile',
-            'previousSessions'
+            'previousSessions',
+            'startApps',
+            'endApps'
         ));
+    }
+
+    public function approveStart(VotingSession $session)
+    {
+        $user = Auth::user();
+
+        // prevent duplicates
+        OperatorApproval::firstOrCreate([
+            'voting_session_id' => $session->id,
+            'operator_id'       => $user->id,
+            'action'            => 'start',
+        ]);
+
+        // once we have 3 distinct approvals — or if the user is admin —
+        $count = $session->startApprovals()->count();
+        if ($count >= 3 || $user->is_admin) {
+            $session->update(['is_active' => true, 'start_at' => now()]);
+        }
+
+        return back();
+    }
+
+    public function approveEnd(VotingSession $session)
+    {
+        $user = Auth::user();
+
+        OperatorApproval::firstOrCreate([
+            'voting_session_id' => $session->id,
+            'operator_id'       => $user->id,
+            'action'            => 'end',
+        ]);
+
+        $count = $session->endApprovals()->count();
+        if ($count >= 3 || $user->is_admin) {
+            $session->update(['is_active' => false, 'end_at' => now()]);
+        }
+
+        return back();
     }
 
     public function startVoting(Request $request)
     {
-        $data = $request->validate([
+        // 1) Validate if present; they’re both optional
+        $request->validate([
             'start_at' => 'nullable|date',
             'end_at'   => 'nullable|date|after:start_at',
         ]);
 
-        // Decide the real start time:
-        $start = $data['start_at']
-            ? \Carbon\Carbon::parse($data['start_at'])
+        // 2) Grab them (will be null if absent)
+        $startInput = $request->input('start_at');
+        $endInput   = $request->input('end_at');
+
+        // 3) Decide real start time
+        $start = $startInput
+            ? Carbon::parse($startInput)
             : now();
 
-        // Close any previous active session
-        VotingSession::where('is_active', true)->update(['is_active' => false]);
+        // 4) Close any previous session
+        VotingSession::where('is_active', true)
+            ->update(['is_active' => false]);
 
-        // Reset voters
+        // 5) Reset ballots/voters
         ValidVoter::query()->update(['has_voted' => false]);
 
-        // Create new session
-        $session = VotingSession::create([
-            'start_at' => $start,
-            'end_at' => $data['end_at'] ?? null,
+        // 6) Build payload
+        $payload = [
+            'start_at'  => $start,
             'is_active' => true,
-        ]);
+        ];
+        if ($endInput) {
+            $payload['end_at'] = Carbon::parse($endInput);
+        }
 
-        return back()->with('success', 'زمان رای گیری ثبت شد');
+        // 7) Create new session
+        VotingSession::create($payload);
+
+        return back()->with('success', 'Voting session scheduled.');
     }
 
     public function endVoting()

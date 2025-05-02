@@ -39,27 +39,35 @@
     {{-- Current queue --}}
     <h4 class="mb-3">لیست {{ $queue->count() }} نفر در صف</h4>
     <table class="table">
-      <thead><tr>
-        <th>کد ملی</th>
-        <th>شروع</th>
-        <th>انقضا</th>
-      </tr></thead>
-      <tbody>
-        @forelse($queue as $q)
+        <thead>
           <tr>
-            <td>{{ $q->voter_id }}</td>
-            <td>{{ $q->started_at->format('H:i:s') }}</td>
-            <td>{{ $q->expires_at->format('H:i:s') }}</td>
+            <th>کد ملی</th>
+            <th>شروع</th>
+            <th>انقضا</th>
+            <th>اقدام</th>
           </tr>
-        @empty
-          <tr>
-            <td colspan="3" class="text-center text-muted">
-              هیچ فردی در صف نیست.
-            </td>
-          </tr>
-        @endforelse
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          @forelse($queue as $q)
+            <tr>
+              <td>{{ $q->voter_id }}</td>
+              <td>{{ $q->started_at->format('H:i:s') }}</td>
+              <td>{{ $q->expires_at->format('H:i:s') }}</td>
+              <td>
+                <form action="{{ route('verify.queue.remove', $q->id) }}" method="POST" onsubmit="return confirm('حذف از صف؟')">
+                  @csrf
+                  @method('DELETE')
+                  <button class="btn btn-sm btn-outline-danger">حذف</button>
+                </form>
+              </td>
+            </tr>
+          @empty
+            <tr>
+              <td colspan="4" class="text-center text-muted">هیچ فردی در صف نیست.</td>
+            </tr>
+          @endforelse
+        </tbody>
+      </table>
 
   @endif
 </div>

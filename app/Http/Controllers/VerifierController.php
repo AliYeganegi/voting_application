@@ -15,8 +15,8 @@ class VerifierController extends Controller
     {
         // 1. Find active session (or null)
         $session = VotingSession::where('is_active', true)
-                    ->latest()
-                    ->first();
+            ->latest()
+            ->first();
 
         // 2. If there is one, expire old and load queue, otherwise empty collection
         if ($session) {
@@ -45,21 +45,21 @@ class VerifierController extends Controller
         // 1) Ensure voter exists
         $voter = ValidVoter::where('voter_id', $data['voter_id'])->first();
         if (! $voter) {
-            return back()->withErrors(['voter_id'=>'کد ملی نامعتبر است.']);
+            return back()->withErrors(['voter_id' => 'کد ملی نامعتبر است.']);
         }
 
         // 2) Get active session
         $session = VotingSession::where('is_active', true)
-                    ->latest()
-                    ->firstOrFail();
+            ->latest()
+            ->firstOrFail();
 
         // 3) Compute hash
         $voterHash = hash('sha256', $data['voter_id']);
 
         // 4) Prevent re-queue if already voted
         $hasVoted = Vote::where('voting_session_id', $session->id)
-                        ->where('hashed_voter_id', $voterHash)
-                        ->exists();
+            ->where('hashed_voter_id', $voterHash)
+            ->exists();
 
         if ($hasVoted) {
             return back()->withErrors([
@@ -69,17 +69,17 @@ class VerifierController extends Controller
 
         // 5) Expire old
         Verification::where('voting_session_id', $session->id)
-            ->where('status','pending')
-            ->where('expires_at','<',now())
-            ->update(['status'=>'expired']);
+            ->where('status', 'pending')
+            ->where('expires_at', '<', now())
+            ->update(['status' => 'expired']);
 
         // 6) Count current pending
         $count = Verification::where('voting_session_id', $session->id)
-            ->where('status','pending')
+            ->where('status', 'pending')
             ->count();
 
         if ($count >= 3) {
-            return back()->withErrors(['voter_id'=>'صف تأیید پر است. لطفاً صبر کنید.']);
+            return back()->withErrors(['voter_id' => 'صف تأیید پر است. لطفاً صبر کنید.']);
         }
 
         // 7) Add to queue
@@ -92,6 +92,14 @@ class VerifierController extends Controller
             'status'            => 'pending',
         ]);
 
-        return back()->with('success','کد ملی به صف تأیید اضافه شد.');
+        return back()->with('success', 'کد ملی به صف تأیید اضافه شد.');
+    }
+
+    public function removeFromQueue($id)
+    {
+        $entry = Verification::findOrFail($id);
+        $entry->delete();
+
+        return redirect()->back()->with('success', 'فرد با موفقیت از صف حذف شد.');
     }
 }

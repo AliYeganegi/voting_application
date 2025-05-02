@@ -19,11 +19,33 @@ class UserSeeder extends Seeder
         ]);
 
         User::create([
+            'name' => 'Operator 2',
+            'email' => 'op2@example.com',
+            'password' => Hash::make('password2'),
+            'is_operator' => true,
+        ]);
+
+        User::create([
+            'name' => 'Operator 3',
+            'email' => 'op3@example.com',
+            'password' => Hash::make('password3'),
+            'is_operator' => true,
+        ]);
+
+        User::create([
+            'name' => 'Verifier 1',
+            'email' => 'vrf1@example.com',
+            'password' => Hash::make('password4'),
+            'is_operator' => true,
+        ]);
+
+        User::create([
             'name' => 'admin',
             'email' => 'admin@example.com',
             'password' => Hash::make('admin'),
             'is_operator' => true,
             'is_admin' => true,
+            'is_verifier' => true,
         ]);
     }
 }

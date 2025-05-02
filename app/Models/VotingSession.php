@@ -17,4 +17,16 @@ class VotingSession extends Model
     {
         return $this->hasMany(Vote::class);
     }
+
+    public function startApprovals()
+    {
+        return $this->hasMany(OperatorApproval::class)
+            ->where('action', 'start');
+    }
+
+    public function endApprovals()
+    {
+        return $this->hasMany(OperatorApproval::class)
+            ->where('action', 'end');
+    }
 }
