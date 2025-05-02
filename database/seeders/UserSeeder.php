@@ -36,7 +36,7 @@ class UserSeeder extends Seeder
             'name' => 'Verifier 1',
             'email' => 'vrf1@example.com',
             'password' => Hash::make('password4'),
-            'is_operator' => true,
+            'is_verifier' => true,
         ]);
 
         User::create([
