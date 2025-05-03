@@ -135,6 +135,9 @@ Route::middleware(['auth', AdminMiddleware::class])
         // User management
         Route::resource('users', UserManagementController::class)
             ->except(['show']);
+
+        Route::post('/upload-candidate-images', [AdminController::class, 'uploadCandidateImages'])
+            ->name('admin.uploadCandidateImages');
     });
 
 /*

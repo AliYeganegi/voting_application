@@ -25,9 +25,13 @@ class HomeController extends Controller
      */
     public function index()
     {
+        if (auth()->user()->is_verifier == 1 && auth()->user()->is_operator == 0) {
+            return redirect()->route('verify.index');
+        }
+
         $session =  $session = VotingSession::where('is_active', true)
-        ->latest()
-        ->first();
+            ->latest()
+            ->first();
         $candidates = User::where('is_candidate', true)->get();
 
         return view('vote.index', compact('candidates', 'session'));

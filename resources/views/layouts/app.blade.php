@@ -21,9 +21,11 @@
             <div class="container">
 
                 {{-- Branding --}}
-                <a class="navbar-brand" href="{{ url('/') }}">
-                    سیستم رأی‌گیری
+                <a class="navbar-brand d-flex align-items-center" href="{{ url('/') }}">
+                    <img src="{{ asset('storage/logo/logo.jpg') }}" alt="Logo"
+                         style="height: 70px; width: 70px;" class="me-2">
                 </a>
+
                 <button class="navbar-toggler"
                         type="button"
                         data-bs-toggle="collapse"
@@ -129,11 +131,11 @@
                                     <a class="nav-link" href="{{ route('login') }}">ورود</a>
                                 </li>
                             @endif
-                            @if(Route::has('register'))
+                            {{-- @if(Route::has('register'))
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('register') }}">ثبت‌نام</a>
                                 </li>
-                            @endif
+                            @endif --}}
                         @else
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle"

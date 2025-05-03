@@ -17,6 +17,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use ZipArchive;
 
 class AdminController extends Controller
 {
@@ -25,9 +26,8 @@ class AdminController extends Controller
         $session           = VotingSession::latest()->first();
         $lastVoterFile     = ImportFile::where('type', 'voters')->latest()->first();
         $lastCandidateFile = ImportFile::where('type', 'candidates')->latest()->first();
-        $previousSessions  = VotingSession::where('is_active', false)
-            ->orderBy('start_at', 'desc')
-            ->get();
+        $previousSessions  = VotingSession::where('is_active', false)->orderBy('start_at', 'desc')->get();
+        $lastCandidateImagesZip = ImportFile::where('type','candidate_images')->latest()->first();
 
         // load approvals so far
         $startApps = $session
@@ -43,7 +43,8 @@ class AdminController extends Controller
             'lastCandidateFile',
             'previousSessions',
             'startApps',
-            'endApps'
+            'endApps',
+            'lastCandidateImagesZip'
         ));
     }
 
@@ -219,5 +220,51 @@ class AdminController extends Controller
             ->get();
 
         return view('admin.ballots', compact('session', 'ballots'));
+    }
+
+    public function uploadCandidateImages(Request $request)
+    {
+        $request->validate([
+            'images_zip' => 'required|file|mimes:zip',
+        ], [ 'images_zip.mimes' => 'فقط فایل با پسوند ZIP مجاز است.' ]);
+
+        // 1) Store the ZIP itself on the local disk
+        $original = $request->file('images_zip')->getClientOriginalName();
+        $zipPath  = $request
+            ->file('images_zip')
+            ->storeAs('imports/candidate_images', $original, 'local');
+
+        // 2) Make sure extraction dir exists
+        Storage::disk('public')->makeDirectory('candidates');
+
+        // 3) Open the ZIP by its absolute path
+        $zip = new ZipArchive;
+        $full = Storage::disk('local')->path($zipPath);
+        if ($zip->open($full) !== true) {
+            return back()->withErrors(['error' => 'باز کردن فایل ZIP با خطا مواجه شد.']);
+        }
+
+        // 4) Extract only JPGs, overwriting any old ones
+        for ($i = 0; $i < $zip->numFiles; $i++) {
+            $entry = $zip->getNameIndex($i);
+            if (preg_match('/\.(jpe?g)$/i', $entry)) {
+                $filename = basename($entry);
+                if ($stream = $zip->getStream($entry)) {
+                    Storage::disk('public')
+                           ->put("candidates/{$filename}", stream_get_contents($stream));
+                    fclose($stream);
+                }
+            }
+        }
+        $zip->close();
+
+        // 5) Record the import (now path is never null)
+        ImportFile::create([
+            'type'          => 'candidate_images',
+            'original_name' => $original,
+            'path'          => $zipPath,
+        ]);
+
+        return back()->with('success', 'تصاویر نامزدها با موفقیت بارگذاری و استخراج شدند.');
     }
 }
