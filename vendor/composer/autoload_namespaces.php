@@ -7,4 +7,5 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'HTMLPurifier' => array($vendorDir . '/ezyang/htmlpurifier/library'),
+    'Arphp' => array($vendorDir . '/ar-php/ar-php/src'),
 );

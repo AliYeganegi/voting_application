@@ -178,7 +178,7 @@ return [
          *
          * @var string
          */
-        'default_font'=> 'vazirmatn',
+        'default_font' => 'vazirmatn',
 
         /**
          * Image DPI setting
@@ -299,10 +299,10 @@ return [
 
     'fontdata' => [
         'vazirmatn' => [
-            'R' => 'Vazirmatn.ttf',
-            // if you get a bold variant later:
-            // 'B' => 'Vazirmatn-Bold.ttf',
+            'R' => 'Vazirmatn-Regular.ttf',
+            'B' => 'Vazirmatn-Bold.ttf',
+            'useOTL' => 0xFF,
+            'useKashida' => 75,
         ],
     ],
-
 ];
