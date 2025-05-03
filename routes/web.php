@@ -63,6 +63,9 @@ Route::middleware(['auth', OperatorMiddleware::class])->prefix('operator')->grou
     Route::post('session/create‐and‐approve‐start', [OperatorController::class, 'createAndApproveStart'])
         ->name('operator.session.create-and-approve-start');
 
+    Route::post('{session}/cancel', [OperatorController::class, 'cancelSession'])
+        ->name('operator.session.cancel');
+
     Route::match(['get', 'post'], 'vote/confirm', [VoteController::class, 'confirm'])
         ->name('vote.confirm')
         ->middleware(CheckVerificationQueue::class);

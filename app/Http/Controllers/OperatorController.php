@@ -17,7 +17,7 @@ class OperatorController extends Controller
     {
         $session = VotingSession::where(function ($q) {
             $q->where('is_active', true)
-              ->orWhereNull('end_at');
+                ->orWhereNull('end_at');
         })->latest()->first();
 
         $startApps         = optional($session)->startApprovals ?? collect();
@@ -104,10 +104,15 @@ class OperatorController extends Controller
         return back()->with('success', 'رای گیری پایان یافت و فایل نتایج ایجاد شد.');
     }
 
-    public function createAndApproveStart()
+    public function createAndApproveStart(Request $request)
     {
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
         // 1) create a stub session (inactive, no start_at yet)
         $session = VotingSession::create([
+            'name'      => $data['name'],
             'start_at'  => null,
             'end_at'    => null,
             'is_active' => false,
@@ -131,5 +136,17 @@ class OperatorController extends Controller
         ])->orderByDesc('id')->get();
 
         return view('operator.history', compact('sessions'));
+    }
+
+    public function cancelSession(VotingSession $session)
+    {
+        // delete any approvals
+        OperatorApproval::where('voting_session_id', $session->id)->delete();
+        // delete the session itself
+        $session->delete();
+
+        return redirect()
+            ->route('operator.session')
+            ->with('success', 'جلسه لغو شد.');
     }
 }

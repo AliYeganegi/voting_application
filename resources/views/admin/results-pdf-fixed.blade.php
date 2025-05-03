@@ -1,17 +1,16 @@
+{{-- resources/views/admin/results-pdf-fixed.blade.php --}}
 <!DOCTYPE html>
-<html>
+<html lang="fa" dir="rtl">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>نتایج رای‌گیری</title>
+    <meta charset="utf-8"/>
+    <title>نتایج رأی‌گیری جلسه {{ $session->name }}</title>
     <style>
-        /* Define font face manually */
         @font-face {
             font-family: 'vazirmatn';
             font-weight: normal;
             font-style: normal;
             src: url("{{ storage_path('fonts/Vazirmatn-Regular.ttf') }}") format('truetype');
         }
-
         @font-face {
             font-family: 'vazirmatn';
             font-weight: bold;
@@ -22,62 +21,79 @@
         * {
             font-family: 'vazirmatn', sans-serif;
         }
-
-        html {
-            direction: rtl;
-        }
-
-        body {
+        html, body {
             direction: rtl;
             text-align: right;
-            font-family: 'vazirmatn', sans-serif;
             padding: 20px;
         }
-
-        h1 {
-            text-align: center;
-            font-family: 'vazirmatn', sans-serif;
-            font-weight: bold;
-            font-size: 18px;
+        .header {
+            position: relative;
             margin-bottom: 20px;
+        }
+        .header img.logo {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 50px;
+        }
+        .header .title {
+            margin: 0;
+            font-size: 22px;
+            font-weight: bold;
+        }
+        .header .session-name {
+            margin: 10px 0 0;
+            font-size: 18px;
+        }
+        .header .times {
+            margin: 5px 0 0;
+            font-size: 14px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
-            font-family: 'vazirmatn', sans-serif;
         }
-
         table, th, td {
             border: 1px solid #000;
         }
-
         th, td {
             padding: 8px;
-            text-align: right;
         }
-
         th {
-            background-color: #f2f2f2;
+            background: #f2f2f2;
             font-weight: bold;
         }
-
         .center-align {
             text-align: center;
         }
-
         .footer {
             margin-top: 30px;
             text-align: center;
             font-size: 12px;
-            direction: rtl;
         }
     </style>
 </head>
 <body>
-    <h1>نتایج رای‌گیری جلسه {{ $session->id }}</h1>
+    <div class="header">
+        {{-- Logo on the left --}}
+        <img class="logo" src="{{ public_path('storage/logo/logo.jpg') }}" alt="Logo">
 
+        {{-- Main title --}}
+        <h1 class="title">نتایج رأی‌گیری</h1>
+
+        {{-- Session name --}}
+        <h2 class="session-name">جلسه: {{ $session->name }}</h2>
+
+        {{-- Start & End times --}}
+        <div class="times">
+            <p>شروع: {{ $session->start_at->format('Y-m-d H:i') }}</p>
+            <p>پایان: {{ $session->end_at->format('Y-m-d H:i') }}</p>
+        </div>
+    </div>
+
+    {{-- Results table --}}
     <table>
         <thead>
             <tr>
@@ -87,16 +103,17 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($results as $index => $candidate)
-            <tr>
-                <td class="center-align">{{ $index + 1 }}</td>
-                <td>{{ $candidate->name }}</td>
-                <td class="center-align">{{ $candidate->votes_count }}</td>
-            </tr>
+            @foreach($results as $i => $cand)
+                <tr>
+                    <td class="center-align">{{ $i + 1 }}</td>
+                    <td>{{ $cand->name }}</td>
+                    <td class="center-align">{{ $cand->votes_count }}</td>
+                </tr>
             @endforeach
         </tbody>
     </table>
 
+    {{-- Footer --}}
     <div class="footer">
         این گزارش در تاریخ {{ now()->format('Y-m-d H:i') }} ایجاد شده است
     </div>

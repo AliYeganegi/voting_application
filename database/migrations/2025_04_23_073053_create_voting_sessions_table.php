@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('voting_sessions', function (Blueprint $table) {
             $table->id();
+            $table->string('name')->nullable();
             $table->timestamp('start_at')->nullable();
             $table->timestamp('end_at')->nullable();
             $table->boolean('is_active')->default(false);

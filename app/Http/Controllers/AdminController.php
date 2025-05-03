@@ -92,6 +92,7 @@ class AdminController extends Controller
     {
         // 1) Validate if present; they’re both optional
         $request->validate([
+            'name'     => 'required|string|max:255',
             'start_at' => 'nullable|date',
             'end_at'   => 'nullable|date|after:start_at',
         ]);
@@ -114,6 +115,7 @@ class AdminController extends Controller
 
         // 6) Build payload
         $payload = [
+            'name'      => $request['name'],
             'start_at'  => $start,
             'is_active' => true,
         ];

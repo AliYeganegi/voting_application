@@ -57,7 +57,7 @@
                             @endif
                         </div>
 
-                        {{-- 2) ENDED SESSION --}}
+                    {{-- 2) ENDED SESSION --}}
                     @elseif($session->start_at && $session->end_at)
                         <div class="alert alert-secondary text-center">
                             <h4>رأی‌گیری به پایان رسید</h4>
@@ -69,7 +69,6 @@
                             </p>
                         </div>
 
-                        {{-- end‑approvals (readonly) --}}
                         <div class="border rounded p-3 mb-3">
                             <h5>تأیید پایان رأی‌گیری توسط اپراتورها</h5>
                             <p><strong>{{ $endApps->count() }} / 3</strong> اپراتور تأیید کرده‌اند</p>
@@ -83,29 +82,40 @@
                             </ul>
 
                             @if (auth()->user()->is_admin)
-                                {{-- After end, admin may start a fresh session --}}
+                                {{-- After end, admin can start a fresh session --}}
                                 <form action="{{ route('admin.start') }}" method="POST" class="mt-2">
                                     @csrf
+
+                                    {{-- session name --}}
+                                    <div class="mb-2">
+                                        <label class="form-label">نام جلسه</label>
+                                        <input type="text"
+                                               name="name"
+                                               class="form-control"
+                                               placeholder="مثلاً جلسه عمومی"
+                                               value="{{ old('name') }}"
+                                               {{ $canStart ? '' : 'disabled' }}>
+                                    </div>
+
                                     <button class="btn btn-success w-100" {{ $canStart ? '' : 'disabled' }}>
                                         شروع جلسهٔ جدید (Admin)
                                     </button>
                                     @unless ($canStart)
                                         <small class="text-danger d-block mt-2">
-                                            برای شروع باید ابتدا هر دو فایل رأی‌دهندگان و نامزدها را وارد شوند.
+                                            برای شروع باید ابتدا فایل‌های رأی‌دهندگان و نامزدها را وارد شوند.
                                         </small>
                                     @endunless
                                 </form>
                             @endif
                         </div>
 
-                        {{-- 3) NEVER‑STARTED STUB SESSION --}}
+                    {{-- 3) NEVER‑STARTED STUB SESSION --}}
                     @else
                         <div class="alert alert-warning text-center">
                             <h4>جلسه ایجاد شده اما شروع نشده است</h4>
                             <p>اپراتورها هنوز تأیید شروع را تکمیل نکرده‌اند.</p>
                         </div>
 
-                        {{-- start‑approvals --}}
                         <div class="border rounded p-3 mb-3">
                             <h5>تأیید شروع رأی‌گیری توسط اپراتورها</h5>
                             <p><strong>{{ $startApps->count() }} / 3</strong> اپراتور تأیید کرده‌اند</p>
@@ -121,6 +131,18 @@
                             @if (auth()->user()->is_admin)
                                 <form action="{{ route('admin.start') }}" method="POST" class="mt-2">
                                     @csrf
+
+                                    {{-- session name --}}
+                                    <div class="mb-2">
+                                        <label class="form-label">نام جلسه</label>
+                                        <input type="text"
+                                               name="name"
+                                               class="form-control"
+                                               placeholder="مثلاً جلسه عمومی"
+                                               value="{{ old('name', $session->name) }}"
+                                               {{ $canStart ? '' : 'disabled' }}>
+                                    </div>
+
                                     <button class="btn btn-success w-100" {{ $canStart ? '' : 'disabled' }}>
                                         شروع رأی‌گیری (Admin)
                                     </button>
@@ -134,7 +156,7 @@
                         </div>
                     @endif
 
-                    {{-- NO SESSION AT ALL --}}
+                {{-- NO SESSION AT ALL --}}
                 @else
                     <div class="alert alert-warning text-center">
                         <h4>رأی‌گیری فعال نیست</h4>
@@ -151,6 +173,18 @@
                         @if (auth()->user()->is_admin)
                             <form action="{{ route('admin.start') }}" method="POST" class="mt-2">
                                 @csrf
+
+                                {{-- session name --}}
+                                <div class="mb-2">
+                                    <label class="form-label">نام جلسه</label>
+                                    <input type="text"
+                                           name="name"
+                                           class="form-control"
+                                           placeholder="مثلاً جلسه عمومی"
+                                           value="{{ old('name') }}"
+                                           {{ $canStart ? '' : 'disabled' }}>
+                                </div>
+
                                 <button class="btn btn-success w-100" {{ $canStart ? '' : 'disabled' }}>
                                     شروع رأی‌گیری (Admin)
                                 </button>

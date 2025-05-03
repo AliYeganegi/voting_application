@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class VotingSession extends Model
 {
-    protected $fillable = ['start_at', 'end_at', 'is_active', 'result_file'];
+    protected $fillable = ['start_at', 'end_at', 'is_active', 'result_file', 'name'];
     protected $casts = [
         'start_at' => 'datetime',
         'end_at' => 'datetime',
