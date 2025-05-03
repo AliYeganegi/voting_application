@@ -21,41 +21,124 @@
         <div class="card mb-4">
             <div class="card-body">
 
-                @if ($session && $session->is_active)
-                    {{-- Active session info --}}
-                    <div class="alert alert-info text-center">
-                        <h4>رأی‌گیری در حال انجام است</h4>
-                        <p>
-                            شروع: {{ $session->start_at->format('Y-m-d H:i') }}<br>
-                            پایان:
-                            {{ $session->end_at ? $session->end_at->format('Y-m-d H:i') : 'تعریف نشده' }}
-                        </p>
-                    </div>
+                @if ($session)
 
-                    {{-- —— اپراتورها تأیید پایان —— --}}
-                    <div class="border rounded p-3 mb-3">
-                        <h5>تأیید پایان رأی‌گیری توسط اپراتورها</h5>
-                        <p><strong>{{ $endApps->count() }} / 3</strong> اپراتور تأیید کرده‌اند</p>
-                        <ul class="mb-3">
-                            @foreach ($endApps as $app)
-                                <li>{{ $app->operator->name }} — {{ $app->created_at->format('H:i:s') }}</li>
-                            @endforeach
-                        </ul>
+                    {{-- 1) ACTIVE SESSION --}}
+                    @if ($session->is_active)
+                        <div class="alert alert-info text-center">
+                            <h4>رأی‌گیری در حال انجام است</h4>
+                            <p>
+                                شروع:
+                                {{ optional($session->start_at)->format('Y-m-d H:i') }}<br>
+                                پایان:
+                                {{ optional($session->end_at)->format('Y-m-d H:i') ?? 'تعریف نشده' }}
+                            </p>
+                        </div>
 
-                        @if (auth()->user()->is_admin)
-                            <form action="{{ route('admin.stop') }}" method="POST" class="mt-2">
-                                @csrf
-                                <button class="btn btn-danger w-100">پایان رأی‌گیری (Admin)</button>
-                            </form>
-                        @endif
-                    </div>
+                        {{-- end‑approvals --}}
+                        <div class="border rounded p-3 mb-3">
+                            <h5>تأیید پایان رأی‌گیری توسط اپراتورها</h5>
+                            <p><strong>{{ $endApps->count() }} / 3</strong> اپراتور تأیید کرده‌اند</p>
+                            <ul class="mb-3">
+                                @foreach ($endApps as $app)
+                                    <li>
+                                        {{ $app->operator->name }}
+                                        — {{ $app->created_at->format('H:i:s') }}
+                                    </li>
+                                @endforeach
+                            </ul>
+                            @if (auth()->user()->is_admin)
+                                <form action="{{ route('admin.stop') }}" method="POST" class="mt-2">
+                                    @csrf
+                                    <button class="btn btn-danger w-100">
+                                        پایان رأی‌گیری (Admin)
+                                    </button>
+                                </form>
+                            @endif
+                        </div>
+
+                        {{-- 2) ENDED SESSION --}}
+                    @elseif($session->start_at && $session->end_at)
+                        <div class="alert alert-secondary text-center">
+                            <h4>رأی‌گیری به پایان رسید</h4>
+                            <p>
+                                شروع:
+                                {{ optional($session->start_at)->format('Y-m-d H:i') }}<br>
+                                پایان:
+                                {{ optional($session->end_at)->format('Y-m-d H:i') }}
+                            </p>
+                        </div>
+
+                        {{-- end‑approvals (readonly) --}}
+                        <div class="border rounded p-3 mb-3">
+                            <h5>تأیید پایان رأی‌گیری توسط اپراتورها</h5>
+                            <p><strong>{{ $endApps->count() }} / 3</strong> اپراتور تأیید کرده‌اند</p>
+                            <ul class="mb-3">
+                                @foreach ($endApps as $app)
+                                    <li>
+                                        {{ $app->operator->name }}
+                                        — {{ $app->created_at->format('H:i:s') }}
+                                    </li>
+                                @endforeach
+                            </ul>
+
+                            @if (auth()->user()->is_admin)
+                                {{-- After end, admin may start a fresh session --}}
+                                <form action="{{ route('admin.start') }}" method="POST" class="mt-2">
+                                    @csrf
+                                    <button class="btn btn-success w-100" {{ $canStart ? '' : 'disabled' }}>
+                                        شروع جلسهٔ جدید (Admin)
+                                    </button>
+                                    @unless ($canStart)
+                                        <small class="text-danger d-block mt-2">
+                                            برای شروع باید ابتدا هر دو فایل رأی‌دهندگان و نامزدها را وارد شوند.
+                                        </small>
+                                    @endunless
+                                </form>
+                            @endif
+                        </div>
+
+                        {{-- 3) NEVER‑STARTED STUB SESSION --}}
+                    @else
+                        <div class="alert alert-warning text-center">
+                            <h4>جلسه ایجاد شده اما شروع نشده است</h4>
+                            <p>اپراتورها هنوز تأیید شروع را تکمیل نکرده‌اند.</p>
+                        </div>
+
+                        {{-- start‑approvals --}}
+                        <div class="border rounded p-3 mb-3">
+                            <h5>تأیید شروع رأی‌گیری توسط اپراتورها</h5>
+                            <p><strong>{{ $startApps->count() }} / 3</strong> اپراتور تأیید کرده‌اند</p>
+                            <ul class="mb-3">
+                                @foreach ($startApps as $app)
+                                    <li>
+                                        {{ $app->operator->name }}
+                                        — {{ $app->created_at->format('H:i:s') }}
+                                    </li>
+                                @endforeach
+                            </ul>
+
+                            @if (auth()->user()->is_admin)
+                                <form action="{{ route('admin.start') }}" method="POST" class="mt-2">
+                                    @csrf
+                                    <button class="btn btn-success w-100" {{ $canStart ? '' : 'disabled' }}>
+                                        شروع رأی‌گیری (Admin)
+                                    </button>
+                                    @unless ($canStart)
+                                        <small class="text-danger d-block mt-2">
+                                            برای شروع باید ابتدا فایل‌های رأی‌دهندگان و نامزدها را وارد شوند.
+                                        </small>
+                                    @endunless
+                                </form>
+                            @endif
+                        </div>
+                    @endif
+
+                    {{-- NO SESSION AT ALL --}}
                 @else
-                    {{-- No active session --}}
                     <div class="alert alert-warning text-center">
                         <h4>رأی‌گیری فعال نیست</h4>
                     </div>
-
-                    {{-- —— اپراتورها تأیید شروع —— --}}
                     <div class="border rounded p-3 mb-3">
                         <h5>تأیید شروع رأی‌گیری توسط اپراتورها</h5>
                         <p><strong>{{ $startApps->count() }} / 3</strong> اپراتور تأیید کرده‌اند</p>
