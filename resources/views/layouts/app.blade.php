@@ -20,16 +20,13 @@
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
             <div class="container">
 
-                {{-- Branding --}}
                 <a class="navbar-brand d-flex align-items-center" href="{{ url('/') }}">
-                    <img src="{{ asset('storage/logo/logo.jpg') }}" alt="Logo"
-                         style="height: 70px; width: 70px;" class="me-2">
+                    <img src="{{ asset('storage/logo/logo.jpg') }}" alt="Logo" style="height: 70px; width: 70px;"
+                        class="me-2">
                 </a>
 
-                <button class="navbar-toggler"
-                        type="button"
-                        data-bs-toggle="collapse"
-                        data-bs-target="#navbarSupportedContent">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
@@ -38,21 +35,21 @@
                     <ul class="navbar-nav me-auto">
                         @auth
                             {{-- Operators --}}
-                            @if(auth()->user()->is_operator)
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('operator.session') }}">
-                                        پنل اپراتور
-                                    </a>
-                                </li>
+                            @if (auth()->user()->is_operator)
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('vote.index') }}">
                                         رأی‌دهی
                                     </a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('operator.session') }}">
+                                        پنل اپراتور
+                                    </a>
+                                </li>
                             @endif
 
                             {{-- Verifiers --}}
-                            @if(auth()->user()->is_verifier)
+                            @if (auth()->user()->is_verifier)
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('verify.index') }}">
                                         صف تأیید
@@ -61,7 +58,7 @@
                             @endif
 
                             {{-- Admin --}}
-                            @if(auth()->user()->is_admin)
+                            @if (auth()->user()->is_admin)
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('admin.dashboard') }}">
                                         پنل مدیریت
@@ -82,12 +79,10 @@
                             {{-- Notifications --}}
                             @php $unreads = auth()->user()->unreadNotifications; @endphp
                             <li class="nav-item dropdown">
-                                <a class="nav-link position-relative dropdown-toggle"
-                                   href="#"
-                                   role="button"
-                                   data-bs-toggle="dropdown">
+                                <a class="nav-link position-relative dropdown-toggle" href="#" role="button"
+                                    data-bs-toggle="dropdown">
                                     🔔
-                                    @if($unreads->count())
+                                    @if ($unreads->count())
                                         <span class="badge bg-danger position-absolute top-0 start-100 translate-middle">
                                             {{ $unreads->count() }}
                                         </span>
@@ -109,7 +104,9 @@
                                             اعلان جدیدی نیست
                                         </li>
                                     @endforelse
-                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
                                     <li>
                                         <form method="POST" action="{{ route('notifications.read') }}">
                                             @csrf
@@ -126,34 +123,27 @@
                     {{-- Left side (login/logout) --}}
                     <ul class="navbar-nav ms-auto">
                         @guest
-                            @if(Route::has('login'))
+                            @if (Route::has('login'))
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('login') }}">ورود</a>
                                 </li>
                             @endif
-                            {{-- @if(Route::has('register'))
+                            {{-- @if (Route::has('register'))
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('register') }}">ثبت‌نام</a>
                                 </li>
                             @endif --}}
                         @else
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle"
-                                   href="#"
-                                   role="button"
-                                   data-bs-toggle="dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                                     {{ Auth::user()->name }}
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-end">
-                                    <a class="dropdown-item"
-                                       href="#"
-                                       onclick="event.preventDefault();document.getElementById('logout-form').submit();">
+                                    <a class="dropdown-item" href="#"
+                                        onclick="event.preventDefault();document.getElementById('logout-form').submit();">
                                         خروج
                                     </a>
-                                    <form id="logout-form"
-                                          action="{{ route('logout') }}"
-                                          method="POST"
-                                          class="d-none">
+                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                                         @csrf
                                     </form>
                                 </div>
@@ -168,6 +158,9 @@
         <main class="py-4">
             @yield('content')
         </main>
+
+        @include('layouts.footer')
     </div>
 </body>
+
 </html>

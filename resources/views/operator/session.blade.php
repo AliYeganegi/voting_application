@@ -9,118 +9,117 @@
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
 
-        {{-- 1) Admin data must exist --}}
-        @if(!$lastVoterFile || !$lastCandidateFile)
+        {{-- 1) Admin must upload both files first --}}
+        @if (! $lastVoterFile || ! $lastCandidateFile)
             <div class="alert alert-warning text-center">
                 ⚠️ برای شروع کار، ابتدا مدیر باید:
                 <ul class="mt-2 mb-0">
-                    @if(!$lastVoterFile)
+                    @if (! $lastVoterFile)
                         <li>فایل رأی‌دهندگان را بارگذاری کند</li>
                     @endif
-                    @if(!$lastCandidateFile)
+                    @if (! $lastCandidateFile)
                         <li>فایل نامزدها را بارگذاری کند</li>
                     @endif
                 </ul>
             </div>
-            @php return; @endphp
-        @endif
-
-        {{-- 2) If no session at all --}}
-        @if(!$session)
-            <div class="card mb-4">
-                <div class="card-body text-center">
-                    <h4>جلسه هنوز ایجاد نشده است</h4>
-                    <form method="POST" action="{{ route('operator.session.create-and-approve-start') }}">
-                        @csrf
-                        <div class="mb-2">
-                            <label for="name" class="form-label">نام جلسه</label>
-                            <input type="text" id="name" name="name" class="form-control" required>
-                        </div>
-                        <button class="btn btn-outline-success">
-                            ایجاد جلسه و تأیید شروع رأی‌گیری
-                        </button>
-                    </form>
-                </div>
-            </div>
-
         @else
-            {{-- show the session name --}}
-            <div class="alert alert-info text-center mb-4">
-                <h4>جلسه: {{ $session->name }}</h4>
-            </div>
-
-            {{-- allow cancel if not active --}}
-            @if(!$session->is_active)
-                <div class="text-center mb-3">
-                    <form method="POST" action="{{ route('operator.session.cancel', $session) }}">
-                        @csrf
-                        <button class="btn btn-outline-warning">
-                            لغو جلسه
-                        </button>
-                    </form>
-                </div>
-            @endif
-
-            {{-- 3) stub session: approve start --}}
-            @if(!$session->is_active)
+            {{-- 2) If no session at all: create & approve --}}
+            @if (! $session)
                 <div class="card mb-4">
-                    <div class="card-body">
-                        <h4>تأیید شروع رأی‌گیری</h4>
-                        <p>
-                            <strong>{{ $startApps->count() }} / 3</strong>
-                            اپراتور تأیید کرده‌اند
-                        </p>
-                        <ul>
-                            @foreach($startApps as $app)
-                                <li>{{ $app->operator->name }} — {{ $app->created_at->format('H:i:s') }}</li>
-                            @endforeach
-                        </ul>
-                        @if(auth()->user()->is_operator)
-                            <form method="POST" action="{{ route('operator.session.approve-start', $session) }}">
-                                @csrf
-                                <button class="btn btn-outline-success"
-                                    {{ $startApps->contains('operator_id', auth()->id()) ? 'disabled' : '' }}>
-                                    {{ $startApps->contains('operator_id', auth()->id())
-                                        ? 'تأیید شده'
-                                        : 'تأیید شروع رأی‌گیری' }}
-                                </button>
-                            </form>
-                        @endif
+                    <div class="card-body text-center">
+                        <h4>جلسه هنوز ایجاد نشده است</h4>
+                        <form method="POST" action="{{ route('operator.session.create-and-approve-start') }}">
+                            @csrf
+                            <div class="mb-2">
+                                <label for="name" class="form-label">نام جلسه</label>
+                                <input type="text" id="name" name="name" class="form-control" required>
+                            </div>
+                            <button class="btn btn-outline-success">
+                                ایجاد جلسه و تأیید شروع رأی‌گیری
+                            </button>
+                        </form>
                     </div>
                 </div>
-            @endif
 
-            {{-- 4) active session: approve end --}}
-            @if($session->is_active)
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <h4>تأیید پایان رأی‌گیری</h4>
-                        <p>
-                            <strong>{{ $endApps->count() }} / 3</strong>
-                            اپراتور تأیید کرده‌اند
-                        </p>
-                        <ul>
-                            @foreach($endApps as $app)
-                                <li>{{ $app->operator->name }} — {{ $app->created_at->format('H:i:s') }}</li>
-                            @endforeach
-                        </ul>
-                        @if(auth()->user()->is_operator)
-                            <form method="POST" action="{{ route('operator.session.approve-end', $session) }}">
-                                @csrf
-                                <button class="btn btn-outline-danger"
-                                    {{ $endApps->contains('operator_id', auth()->id()) ? 'disabled' : '' }}>
-                                    {{ $endApps->contains('operator_id', auth()->id())
-                                        ? 'تأیید شده'
-                                        : 'تأیید پایان رأی‌گیری' }}
-                                </button>
-                            </form>
-                        @endif
-                    </div>
+            @else
+                {{-- show the session name --}}
+                <div class="alert alert-info text-center mb-4">
+                    <h4>جلسه: {{ $session->name }}</h4>
                 </div>
+
+                {{-- 3) Allow cancel if stub --}}
+                @if (! $session->is_active)
+                    <div class="text-center mb-3">
+                        <form method="POST" action="{{ route('operator.session.cancel', $session) }}">
+                            @csrf
+                            <button class="btn btn-outline-warning">
+                                لغو جلسه
+                            </button>
+                        </form>
+                    </div>
+                @endif
+
+                {{-- 4) Stub -> approve start --}}
+                @if (! $session->is_active)
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h4>تأیید شروع رأی‌گیری</h4>
+                            <p>
+                                <strong>{{ $startApps->count() }} / 3</strong>
+                                اپراتور تأیید کرده‌اند
+                            </p>
+                            <ul>
+                                @foreach ($startApps as $app)
+                                    <li>{{ $app->operator->name }} — {{ $app->created_at->format('H:i:s') }}</li>
+                                @endforeach
+                            </ul>
+                            @if (auth()->user()->is_operator)
+                                <form method="POST" action="{{ route('operator.session.approve-start', $session) }}">
+                                    @csrf
+                                    <button class="btn btn-outline-success"
+                                        {{ $startApps->contains('operator_id', auth()->id()) ? 'disabled' : '' }}>
+                                        {{ $startApps->contains('operator_id', auth()->id())
+                                            ? 'تأیید شده'
+                                            : 'تأیید شروع رأی‌گیری' }}
+                                    </button>
+                                </form>
+                            @endif
+                        </div>
+                    </div>
+                @endif
+
+                {{-- 5) Active -> approve end --}}
+                @if ($session->is_active)
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h4>تأیید پایان رأی‌گیری</h4>
+                            <p>
+                                <strong>{{ $endApps->count() }} / 3</strong>
+                                اپراتور تأیید کرده‌اند
+                            </p>
+                            <ul>
+                                @foreach ($endApps as $app)
+                                    <li>{{ $app->operator->name }} — {{ $app->created_at->format('H:i:s') }}</li>
+                                @endforeach
+                            </ul>
+                            @if (auth()->user()->is_operator)
+                                <form method="POST" action="{{ route('operator.session.approve-end', $session) }}">
+                                    @csrf
+                                    <button class="btn btn-outline-danger"
+                                        {{ $endApps->contains('operator_id', auth()->id()) ? 'disabled' : '' }}>
+                                        {{ $endApps->contains('operator_id', auth()->id())
+                                            ? 'تأیید شده'
+                                            : 'تأیید پایان رأی‌گیری' }}
+                                    </button>
+                                </form>
+                            @endif
+                        </div>
+                    </div>
+                @endif
             @endif
         @endif
 
-        {{-- link to history --}}
+        {{-- link to full history --}}
         <div class="text-center">
             <a href="{{ route('operator.history') }}" class="btn btn-sm btn-outline-primary">
                 مشاهده تاریخچه جلسات
