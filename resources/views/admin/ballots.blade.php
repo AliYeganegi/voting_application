@@ -1,9 +1,12 @@
 @extends('layouts.app')
 @section('content')
     <div class="container">
-        <h1 class="text-center mb-4">
-            برگ‌های رأی جلسه {{ $session->start_at->format('Y-m-d H:i') }}
+        <h1 class="text-center mb-2">
+            برگ‌های رأی جلسه {{ ($session->name) }}
         </h1>
+        <h4 class="text-center mb-4">
+            {{ jdate($session->start_at)->format('H:i:s Y/m/d') }} - {{ jdate($session->end_at)->format('H:i:s Y/m/d') }}
+        </h4>
         <div class="text-center mb-3">
             <a href="{{ route('admin.sessions.ballots.pdf', $session) }}" class="btn btn-primary">
                 دانلود PDF برگ‌های رأی
@@ -13,7 +16,7 @@
             <div class="card mb-3">
                 <div class="card-header">
                     برگه رأی شماره {{ $loop->iteration }}
-                    — {{ $ballot->created_at->format('Y-m-d H:i:s') }}
+                    — {{ jdate($ballot->created_at)->format('H:i:s Y/m/d') }}
                 </div>
                 <ul class="list-group list-group-flush">
                     @foreach ($ballot->candidates as $cand)

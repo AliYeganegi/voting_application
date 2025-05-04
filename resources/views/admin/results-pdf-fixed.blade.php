@@ -88,8 +88,8 @@
 
         {{-- Start & End times --}}
         <div class="times">
-            <p>شروع: {{ $session->start_at->format('Y-m-d H:i') }}</p>
-            <p>پایان: {{ $session->end_at->format('Y-m-d H:i') }}</p>
+            <p>شروع: {{ jdate($session->start_at)->format('H:i Y/m/d') }}</p>
+            <p>پایان: {{ jdate($session->end_at)->format('H:i Y/m/d') }}</p>
         </div>
     </div>
 
@@ -115,7 +115,7 @@
 
     {{-- Footer --}}
     <div class="footer">
-        این گزارش در تاریخ {{ now()->format('Y-m-d H:i') }} ایجاد شده است
+        این گزارش در تاریخ {{ jdate(now())->format('H:i Y/m/d') }} ایجاد شده است
     </div>
 </body>
 </html>

@@ -126,7 +126,7 @@ class AdminController extends Controller
         // 7) Create new session
         VotingSession::create($payload);
 
-        return back()->with('success', 'Voting session scheduled.');
+        return back()->with('success', 'رأی‌گیری شروع شد');
     }
 
     public function endVoting()

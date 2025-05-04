@@ -29,9 +29,9 @@
                             <h4>رأی‌گیری در حال انجام است</h4>
                             <p>
                                 شروع:
-                                {{ optional($session->start_at)->format('Y-m-d H:i') }}<br>
+                                {{ jdate($session->start_at)->format('H:i:s Y/m/d') }}<br>
                                 پایان:
-                                {{ optional($session->end_at)->format('Y-m-d H:i') ?? 'تعریف نشده' }}
+                                {{ 'تعریف نشده' }}
                             </p>
                         </div>
 
@@ -63,9 +63,9 @@
                             <h4>رأی‌گیری به پایان رسید</h4>
                             <p>
                                 شروع:
-                                {{ optional($session->start_at)->format('Y-m-d H:i') }}<br>
+                                {{ jdate($session->start_at)->format('H:i:s Y/m/d') }}<br>
                                 پایان:
-                                {{ optional($session->end_at)->format('Y-m-d H:i') }}
+                                {{ jdate($session->end_at)->format('H:i:s Y/m/d') }}
                             </p>
                         </div>
 
@@ -210,7 +210,7 @@
                         @if ($lastVoterFile)
                             <small class="text-muted d-block mb-1">
                                 آخرین فایل رأی‌دهندگان: {{ $lastVoterFile->original_name }}
-                                ({{ $lastVoterFile->created_at->format('Y-m-d H:i') }})
+                                ({{ jdate($lastVoterFile->created_at)->format('Y/m/d H:i:s') }})
                             </small>
                         @endif
                     </div>
@@ -234,7 +234,7 @@
                         @if ($lastCandidateFile)
                             <small class="text-muted d-block mb-1">
                                 آخرین فایل نامزدها: {{ $lastCandidateFile->original_name }}
-                                ({{ $lastCandidateFile->created_at->format('Y-m-d H:i') }})
+                                ({{ jdate($lastCandidateFile->created_at)->format('Y/m/d H:i:s') }})
                             </small>
                         @endif
                     </div>
@@ -264,7 +264,7 @@
                         @if ($lastCandidateImagesZip)
                             <small class="text-muted d-block mb-1">آخرین فایل تصاویر:
                                 {{ $lastCandidateImagesZip->original_name }}
-                                ({{ $lastCandidateImagesZip->created_at->format('Y-m-d H:i') }})
+                                ({{ jdate($lastCandidateImagesZip->created_at)->format('Y/m/d H:i:s') }})
                             </small>
                         @endif
                     </div>

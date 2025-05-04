@@ -16,7 +16,7 @@
                 <h5 class="mt-3">تأیید شروع:</h5>
                 <ul>
                     @forelse ($session->startApprovals as $a)
-                        <li>{{ $a->operator->name }} — {{ $a->created_at->format('Y-m-d H:i:s') }}</li>
+                        <li>{{ $a->operator->name }} — {{ jdate($a->created_at->format('Y/m/d H:i:s')) }}</li>
                     @empty
                         <li class="text-muted">بدون تأیید</li>
                     @endforelse
@@ -25,7 +25,7 @@
                 <h5 class="mt-3">تأیید پایان:</h5>
                 <ul>
                     @forelse ($session->endApprovals as $a)
-                        <li>{{ $a->operator->name }} — {{ $a->created_at->format('Y-m-d H:i:s') }}</li>
+                        <li>{{ $a->operator->name }} — {{ jdate($a->created_at->format('Y/m/d H:i:s')) }}</li>
                     @empty
                         <li class="text-muted">بدون تأیید</li>
                     @endforelse

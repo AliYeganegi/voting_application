@@ -6,7 +6,7 @@
             نتایج رأی‌گیری جلسه {{ $session->name }}
         </h1>
         <h4 class="mb-4 text-center">
-            {{ $session->end_at->format('H:i Y-m-d ') }} - {{ $session->start_at->format('H:i Y-m-d ') }}
+            {{ jdate($session->start_at)->format('H:i Y/m/d') }} - {{ jdate($session->end_at)->format('H:i:s Y/m/d') }}
         </h4>
 
         @error('error')

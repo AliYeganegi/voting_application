@@ -30,9 +30,9 @@
                     @foreach ($sessions as $sess)
                         <tr>
                             <td>{{ $sess->name }}</td>
-                            <td>{{ $sess->start_at->format('Y-m-d H:i') }}</td>
+                            <td>{{ jdate($sess->start_at)->format('H:i Y/m/d') }}</td>
                             <td>
-                                {{ $sess->end_at ? $sess->end_at->format('Y-m-d H:i') : 'تعریف نشده' }}
+                                {{ $sess->end_at ? jdate($sess->end_at)->format('H:i Y/m/d') : 'تعریف نشده' }}
                             </td>
                             <td>
                                 @if ($sess->is_active)
@@ -51,12 +51,12 @@
 
                                     {{-- View Ballots --}}
                                     <a href="{{ route('admin.sessions.ballots', $sess->id) }}"
-                                        class="btn btn-sm btn-success">
+                                        class="btn btn-sm btn-primary">
                                         مشاهده برگ‌های رأی
                                     </a>
 
                                     {{-- Download PDF --}}
-                                    @if ($sess->result_file)
+                                    {{-- @if ($sess->result_file)
                                         <a href="{{ route('admin.sessions.results.pdf', $sess->id) }}"
                                             class="btn btn-sm btn-primary">
                                             دانلود PDF نتایج
@@ -66,7 +66,7 @@
                                     <a href="{{ route('admin.sessions.ballots.pdf', $sess) }}"
                                         class="btn btn-sm btn-primary">
                                         دانلود PDF برگ‌های رأی
-                                    </a>
+                                    </a> --}}
 
                                     {{-- Delete session --}}
                                     <form action="{{ route('admin.sessions.destroy', $sess->id) }}" method="POST"

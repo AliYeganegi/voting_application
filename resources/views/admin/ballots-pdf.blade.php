@@ -2,7 +2,7 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="utf-8"/>
-    <title>برگه‌های رأی جلسه {{ optional($session->start_at)->format('Y-m-d H:i') }}</title>
+    <title>برگه‌های رأی جلسه {{ jdate($session->start_at)->format('H:i:s Y/m/d') }}</title>
     <style>
         @font-face {
             font-family: 'vazirmatn'; font-weight: normal; font-style: normal;
@@ -54,13 +54,13 @@
 </head>
 <body>
 
-    <h1>برگه‌های رأی جلسه {{ optional($session->name)->format('Y-m-d H:i') }}</h1>
+    <h1>برگه‌های رأی جلسه {{ ($session->name) }}</h1>
 
     @foreach($ballots as $ballot)
         <div class="ballot">
             <div class="ballot-header">
                 برگه رأی شماره {{ $loop->iteration }}
-                — {{ $ballot->created_at->format('Y-m-d H:i:s') }}
+                — {{ jdate($ballot->created_at)->format('H:i:s Y/m/d') }}
             </div>
             <table>
                 <thead>

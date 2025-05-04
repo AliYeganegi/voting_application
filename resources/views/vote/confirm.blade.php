@@ -28,7 +28,7 @@
                 </div>
             @empty
                 <div class="col-12">
-                    <p class="text-muted">رأی سفید (بدون انتخاب نامزد)</p>
+                    <p class="text-muted">شما هیچ یک از نامزد ها را انتخاب نکرده اید. <br>رای شما رای سفید محسوب می گردد.</p>
                 </div>
             @endforelse
         </div>
