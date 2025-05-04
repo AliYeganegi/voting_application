@@ -40,3 +40,7 @@
         </div>
     </div>
 @endsection
+
+<div class="d-flex justify-content-center mt-4">
+    {{ $ballots->links('vendor.pagination.bootstrap-5') }}
+</div>

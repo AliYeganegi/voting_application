@@ -88,10 +88,5 @@
             </table>
         </div>
     @endforeach
-
-    <div class="d-flex justify-content-center mt-4">
-        {{ $users->links('vendor.pagination.bootstrap-5') }}
-    </div>
-
 </body>
 </html>
