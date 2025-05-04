@@ -10,6 +10,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Mpdf\Mpdf;
 
 class OperatorController extends Controller
 {
@@ -93,11 +94,43 @@ class OperatorController extends Controller
                     $q->where('voting_session_id', $session->id);
                 }])->orderByDesc('votes_count')->get();
 
-            // Generate and store PDF, now passing both $results and $session
-            $pdf = Pdf::loadView('admin.results-pdf', compact('results', 'session'));
+            // 3) Instantiate mPDF with RTL enabled
+            $configVars = (new \Mpdf\Config\ConfigVariables())->getDefaults();
+            $fontDirs   = $configVars['fontDir'];
+            $fontVars   = (new \Mpdf\Config\FontVariables())->getDefaults();
+            $fontData   = $fontVars['fontdata'];
 
+            $mpdf = new Mpdf([
+                'mode'             => 'utf-8',
+                'format'           => 'A4-P',
+                'margin_left'      => 10,
+                'margin_right'     => 10,
+                'margin_top'       => 10,
+                'margin_bottom'    => 10,
+                'fontDir'          => array_merge($fontDirs, [storage_path('fonts')]),
+                'fontdata'         => array_merge($fontData, [
+                    'vazirmatn' => [
+                        'R'         => 'Vazirmatn-Regular.ttf',
+                        'B'         => 'Vazirmatn-Bold.ttf',
+                        'useOTL'    => 0xFF,
+                        'useKashida' => 75,
+                    ]
+                ]),
+                'default_font'     => 'vazirmatn',
+                'autoLangToFont'   => true,
+                'autoScriptToLang' => true,
+            ]);
+
+            // 4) RTL & meta-language for Farsi
+            $mpdf->SetDirectionality('rtl');
+
+            // 5) Render your Blade view (with your fixed RTL styling)
+            $html = view('admin.results-pdf-fixed', compact('results', 'session'))->render();
+            $mpdf->WriteHTML($html);
+
+            // 6) Output to string and store
             $filePath = 'results/session_' . $session->id . '.pdf';
-            Storage::put('public/' . $filePath, $pdf->output());
+            Storage::put('public/' . $filePath, $mpdf->Output('', 'S'));
             $session->update(['result_file' => $filePath]);
         }
 

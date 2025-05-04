@@ -20,6 +20,7 @@
             <thead class="table-light">
                 <tr>
                     <th>شناسه</th>
+                    <th>نام جلسه</th>
                     <th>شروع</th>
                     <th>پایان</th>
                     <th>وضعیت</th>
@@ -30,6 +31,7 @@
                 @foreach($sessions as $sess)
                     <tr>
                         <td>{{ $sess->id }}</td>
+                        <td>{{ $sess->name }}</td>
                         <td>{{ $sess->start_at->format('Y-m-d H:i') }}</td>
                         <td>
                             {{ $sess->end_at
