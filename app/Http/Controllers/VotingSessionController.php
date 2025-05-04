@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\VotingResultsExcelExport;
 use App\Models\VotingSession;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 
 class VotingSessionController extends Controller
 {
@@ -27,5 +29,15 @@ class VotingSessionController extends Controller
         $session->delete();
 
         return back()->with('success', 'جلسه و داده‌های آن با موفقیت حذف شد.');
+    }
+
+    public function exportResultsExcel(VotingSession $session)
+    {
+        if ($session->is_active || ! $session->end_at) {
+            return back()->withErrors(['error' => 'نتایج تنها پس از پایان جلسه قابل دانلود است.']);
+        }
+
+        $filename = 'نتایج جلسه ' . $session->name . '.xlsx';
+        return Excel::download(new VotingResultsExcelExport($session->id), $filename);
     }
 }

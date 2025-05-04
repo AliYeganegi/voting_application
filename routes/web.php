@@ -144,6 +144,9 @@ Route::middleware(['auth', AdminMiddleware::class])
 
         Route::get('/sessions/{session}/ballots/pdf', [AdminController::class, 'downloadBallotsPdf'])
             ->name('admin.sessions.ballots.pdf');
+
+        Route::get('/voting-sessions/{session}/results-excel', [VotingSessionController::class, 'exportResultsExcel'])
+            ->name('admin.voting-sessions.export-excel');
     });
 
 /*

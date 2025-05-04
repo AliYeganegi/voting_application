@@ -17,6 +17,10 @@
             <a href="{{ route('admin.sessions.results.pdf', $session->id) }}" class="btn btn-primary">
                 دانلود PDF نتایج
             </a>
+
+            <a href="{{ route('admin.voting-sessions.export-excel', $session->id) }}" class="btn btn-primary">
+                دانلود EXCEL نتایج
+            </a>
         </div>
 
         <table class="table table-striped table-bordered">
