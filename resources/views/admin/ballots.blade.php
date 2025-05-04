@@ -1,9 +1,12 @@
 @extends('layouts.app')
 @section('content')
     <div class="container">
-        <h1 class="text-center mb-4">
-            برگ‌های رأی جلسه {{ $session->start_at->format('Y-m-d H:i') }}
+        <h1 class="mb-3 text-center">
+            نتایج رأی‌گیری جلسه {{ $session->name }}
         </h1>
+        <h4 class="mb-4 text-center">
+            {{ $session->end_at->format('H:i Y-m-d ') }} - {{ $session->start_at->format('H:i Y-m-d ') }}
+        </h4>
         <div class="text-center mb-3">
             <a href="{{ route('admin.sessions.ballots.pdf', $session) }}" class="btn btn-primary">
                 دانلود PDF برگ‌های رأی
@@ -32,5 +35,8 @@
         @empty
             <div class="alert alert-info">هیچ برگ رأی‌ای ثبت نشده است.</div>
         @endforelse
+        <div class="d-flex justify-content-center mt-4">
+            {{ $ballots->links('vendor.pagination.bootstrap-5') }}
+        </div>
     </div>
 @endsection

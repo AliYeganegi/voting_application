@@ -1,7 +1,7 @@
 {{-- resources/views/layouts/footer.blade.php --}}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-<footer class="bg-white text-center text-md-end py-4 border-top mt-auto" dir="rtl">
+<footer class="bg-white text-center text-md-end py-2 border-top mt-auto" dir="rtl">
     <div class="container">
         <div class="row align-items-center">
             {{-- Right column: About (placed first in RTL) --}}
@@ -17,9 +17,9 @@
 
             {{-- Left column: Contact (placed second in RTL) --}}
             <div class="col-md-6 text-md-start">
-                <p class="mb-1">تماس با ما:</p>
+                <p class="mb-1">تماس با ما</p>
                 <a href="mailto:aliyeganegi2002@gmail.com" class="text-decoration-none text-muted ms-3">
-                    <i class="fas fa-envelope"></i> aliyeganegi2002@gmail.com
+                    <i class="fas fa-envelope"></i>
                 </a>
                 <a href="https://instagram.com" class="text-muted ms-3" target="_blank">
                     <i class="fab fa-instagram"></i>

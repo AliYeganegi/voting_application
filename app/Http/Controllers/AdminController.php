@@ -242,7 +242,7 @@ class AdminController extends Controller
 
     public function previousSessions()
     {
-        $sessions = VotingSession::where('is_active', false)->orderBy('start_at', 'desc')->get();
+        $sessions = VotingSession::where('is_active', false)->orderBy('start_at', 'desc')->paginate(10);
         return view('admin.sessions', compact('sessions'));
     }
 
@@ -256,7 +256,7 @@ class AdminController extends Controller
         // load ballots with candidates
         $ballots = Ballot::with('candidates')
             ->where('voting_session_id', $session->id)
-            ->get();
+            ->paginate(10);
 
         return view('admin.ballots', compact('session', 'ballots'));
     }

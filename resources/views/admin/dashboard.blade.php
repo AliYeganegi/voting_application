@@ -91,7 +91,7 @@
                                         <label class="form-label">نام جلسه</label>
                                         <input type="text" name="name" class="form-control"
                                             placeholder="مثلاً جلسه عمومی" value="{{ old('name') }}"
-                                            {{ $canStart ? '' : 'disabled' }}>
+                                            {{ $canStart ? '' : 'disabled' }} required>
                                     </div>
 
                                     <button class="btn btn-success w-100" {{ $canStart ? '' : 'disabled' }}>
@@ -134,7 +134,7 @@
                                         <label class="form-label">نام جلسه</label>
                                         <input type="text" name="name" class="form-control"
                                             placeholder="مثلاً جلسه عمومی" value="{{ old('name', $session->name) }}"
-                                            {{ $canStart ? '' : 'disabled' }}>
+                                            {{ $canStart ? '' : 'disabled' }} required>
                                     </div>
 
                                     <button class="btn btn-success w-100" {{ $canStart ? '' : 'disabled' }}>

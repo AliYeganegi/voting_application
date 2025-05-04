@@ -19,7 +19,6 @@
             <table class="table table-striped table-bordered">
                 <thead class="table-light">
                     <tr>
-                        <th>شناسه</th>
                         <th>نام جلسه</th>
                         <th>شروع</th>
                         <th>پایان</th>
@@ -30,7 +29,6 @@
                 <tbody>
                     @foreach ($sessions as $sess)
                         <tr>
-                            <td>{{ $sess->id }}</td>
                             <td>{{ $sess->name }}</td>
                             <td>{{ $sess->start_at->format('Y-m-d H:i') }}</td>
                             <td>
@@ -86,5 +84,8 @@
                 </tbody>
             </table>
         @endif
+        <div class="d-flex justify-content-center mt-4">
+            {{ $sessions->links('vendor.pagination.bootstrap-5') }}
+        </div>
     </div>
 @endsection

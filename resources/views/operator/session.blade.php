@@ -9,6 +9,13 @@
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
 
+                {{-- link to full history --}}
+                <div class="text-center mb-5">
+                    <a href="{{ route('operator.history') }}" class="btn btn-sm btn-outline-primary">
+                        مشاهده تاریخچه جلسات
+                    </a>
+                </div>
+
         {{-- 1) Admin must upload both files first --}}
         @if (! $lastVoterFile || ! $lastCandidateFile)
             <div class="alert alert-warning text-center">
@@ -118,12 +125,5 @@
                 @endif
             @endif
         @endif
-
-        {{-- link to full history --}}
-        <div class="text-center">
-            <a href="{{ route('operator.history') }}" class="btn btn-sm btn-outline-primary">
-                مشاهده تاریخچه جلسات
-            </a>
-        </div>
     </div>
 @endsection
