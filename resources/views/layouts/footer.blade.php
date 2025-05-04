@@ -1,15 +1,36 @@
 {{-- resources/views/layouts/footer.blade.php --}}
-<footer class="bg-light text-center py-4 border-top mt-auto">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<footer class="bg-white text-center text-md-end py-4 border-top mt-auto" dir="rtl">
     <div class="container">
-        <p class="mb-1">
-            &copy; {{ date('Y') }} سیستم رأی‌گیری کانون وکلای دادگستری استان قزوین
-        </p>
-        <p class="mb-1 text-muted">
-            طراحی و توسعه توسط تیم فنی دانشگاه بین المللی امام خمینی (ره) — تماس با ما:
-            <a href="mailto:aliyeganegi2002@gmail.com">aliyeganegi2002@gmail.com</a>
-        </p>
-        <small class="text-muted">
-            &copy; {{ date('Y') }} سیستم رأی‌گیری کانون وکلای دادگستری استان قزوین.  همه حقوق محفوظ است.
-        </small>
+        <div class="row align-items-center">
+            {{-- Right column: About (placed first in RTL) --}}
+            <div class="col-md-6 mb-3 mb-md-0 text-md-end">
+                <h6 class="fw-bold">سیستم رأی‌گیری</h6>
+                <p class="text-muted mb-1">
+                    طراحی و توسعه توسط تیم فنی دانشگاه بین‌المللی امام خمینی (ره)
+                </p>
+                <p class="text-muted small mb-0">
+                    کانون وکلای دادگستری استان قزوین &copy; {{ date('Y') }}. تمامی حقوق محفوظ است.
+                </p>
+            </div>
+
+            {{-- Left column: Contact (placed second in RTL) --}}
+            <div class="col-md-6 text-md-start">
+                <p class="mb-1">تماس با ما:</p>
+                <a href="mailto:aliyeganegi2002@gmail.com" class="text-decoration-none text-muted ms-3">
+                    <i class="fas fa-envelope"></i> aliyeganegi2002@gmail.com
+                </a>
+                <a href="https://instagram.com" class="text-muted ms-3" target="_blank">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="https://linkedin.com" class="text-muted ms-3" target="_blank">
+                    <i class="fab fa-linkedin"></i>
+                </a>
+                <a href="https://github.com/AliYeganegi" class="text-muted" target="_blank">
+                    <i class="fab fa-github"></i>
+                </a>
+            </div>
+        </div>
     </div>
 </footer>

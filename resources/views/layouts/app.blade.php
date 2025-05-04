@@ -15,13 +15,13 @@
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 </head>
 
-<body class="text-right bg-light">
-    <div id="app">
+<body class="d-flex flex-column min-vh-100 text-right bg-light">
+    <div id="app" class="d-flex flex-column flex-grow-1">
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
             <div class="container">
 
                 <a class="navbar-brand d-flex align-items-center" href="{{ url('/') }}">
-                    <img src="{{ asset('storage/logo/logo.jpg') }}" alt="Logo" style="height: 70px; width: 70px;"
+                    <img src="{{ asset('storage/logo/logo.jpg') }}" alt="Logo" style="height: 50px; width: 70px;"
                         class="me-2">
                 </a>
 
@@ -155,12 +155,13 @@
             </div>
         </nav>
 
-        <main class="py-4">
+        <main class="py-4 flex-grow-1">
             @yield('content')
         </main>
 
         @include('layouts.footer')
     </div>
+    @stack('scripts')
 </body>
 
 </html>

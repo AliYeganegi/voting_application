@@ -29,23 +29,27 @@ class CandidateImport implements ToModel, WithHeadingRow
      */
     public function model(array $row)
     {
-        // 2) Grab and clean the national ID
-        $nationalId = trim($row['شماره ملی'] ?? '');
 
-        // 3) Skip rows without a valid national ID
-        if ($nationalId === '') {
+        $clean = [];
+        foreach ($row as $key => $value) {
+            $cleanKey        = trim($key);
+            $clean[$cleanKey] = $value;
+        }
+
+        $natId = trim($clean['کدملی'] ?? '');
+
+        if ($natId === '') {
             return null;
         }
 
-        // 4) Create the user as a candidate
         return new User([
+            'national_id'       => $natId,
             'name'           => trim("{$row['نام']} {$row['نام خانوادگی']}"),
-            'email'          => Str::slug($row['نام'].'-'.$row['نام خانوادگی']).'@example.com',
+            'license_number' => trim($clean['شما ره پروانه'] ?? ''),
             'password'       => bcrypt('candidate'),
-            'national_id'    => $nationalId,
-            'license_number' => trim($row['شماره پروانه'] ?? ''),
-            'profile_image'  => $nationalId.'.jpg',
+            'profile_image'  => $natId . '.jpg',
             'is_candidate'   => true,
+            'email'          => Str::slug($row['نام'].'-'.$row['نام خانوادگی']).'@example.com',
         ]);
     }
 }

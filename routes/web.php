@@ -141,6 +141,9 @@ Route::middleware(['auth', AdminMiddleware::class])
 
         Route::post('/upload-candidate-images', [AdminController::class, 'uploadCandidateImages'])
             ->name('admin.uploadCandidateImages');
+
+        Route::get('/sessions/{session}/ballots/pdf', [AdminController::class, 'downloadBallotsPdf'])
+            ->name('admin.sessions.ballots.pdf');
     });
 
 /*

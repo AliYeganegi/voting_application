@@ -25,26 +25,23 @@ class ValidVoterImport implements ToModel, WithHeadingRow
      */
     public function model(array $row)
     {
-        // 2) Trim all the keys so we drop trailing spaces
         $clean = [];
         foreach ($row as $key => $value) {
             $cleanKey        = trim($key);
             $clean[$cleanKey] = $value;
         }
 
-        // 3) Pull out the national ID using the trimmed key
-        $natId = trim($clean['کدملی'] ?? '');
+        $nationalId = trim($row['شماره ملی'] ?? '');
 
-        // 4) If it's empty, skip this row
-        if ($natId === '') {
+        if ($nationalId === '') {
             return null;
         }
 
         return new ValidVoter([
-            'voter_id'       => $natId,
+            'voter_id'       => $nationalId,
             'first_name'     => trim($clean['نام'] ?? ''),
             'last_name'      => trim($clean['نام خانوادگی'] ?? ''),
-            'license_number' => trim($clean['شما ره پروانه'] ?? ''),
+            'license_number' => trim($row['شماره پروانه'] ?? ''),
         ]);
     }
 }

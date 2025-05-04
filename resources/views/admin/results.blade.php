@@ -12,11 +12,7 @@
     <div class="mb-3 text-center">
         <a href="{{ route('admin.sessions.results.pdf', $session->id) }}"
            class="btn btn-primary">
-            دانلود PDF
-        </a>
-        <a href="{{ route('admin.sessions.ballots', $session->id) }}"
-           class="btn btn-secondary ms-2">
-            مشاهده برگ‌های رأی
+            دانلود PDF نتایج
         </a>
     </div>
 

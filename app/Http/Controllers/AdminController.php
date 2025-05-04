@@ -160,13 +160,13 @@ class AdminController extends Controller
             'margin_right'     => 10,
             'margin_top'       => 10,
             'margin_bottom'    => 10,
-            'fontDir'          => array_merge($fontDirs, [ storage_path('fonts') ]),
+            'fontDir'          => array_merge($fontDirs, [storage_path('fonts')]),
             'fontdata'         => array_merge($fontData, [
                 'vazirmatn' => [
                     'R'         => 'Vazirmatn-Regular.ttf',
                     'B'         => 'Vazirmatn-Bold.ttf',
                     'useOTL'    => 0xFF,
-                    'useKashida'=> 75,
+                    'useKashida' => 75,
                 ]
             ]),
             'default_font'     => 'vazirmatn',
@@ -178,7 +178,7 @@ class AdminController extends Controller
         $mpdf->SetDirectionality('rtl');
 
         // 5) Render your Blade view (with your fixed RTL styling)
-        $html = view('admin.results-pdf-fixed', compact('results','session'))->render();
+        $html = view('admin.results-pdf-fixed', compact('results', 'session'))->render();
         $mpdf->WriteHTML($html);
 
         // 6) Output to string and store
@@ -305,5 +305,55 @@ class AdminController extends Controller
         ]);
 
         return back()->with('success', 'تصاویر نامزدها با موفقیت بارگذاری و استخراج شدند.');
+    }
+
+    public function downloadBallotsPdf(VotingSession $session)
+    {
+        // only after session has ended
+        if ($session->is_active || ! $session->end_at) {
+            return back()->withErrors(['error' => 'نتایج تنها پس از پایان جلسه قابل دانلود است.']);
+        }
+
+        $ballots = Ballot::with('candidates')->where('voting_session_id', $session->id)->get();
+
+        // Instantiate mPDF with RTL and our Vazirmatn font
+        $configVars = (new \Mpdf\Config\ConfigVariables())->getDefaults();
+        $fontDirs   = $configVars['fontDir'];
+        $fontVars   = (new \Mpdf\Config\FontVariables())->getDefaults();
+        $fontData   = $fontVars['fontdata'];
+
+        $mpdf = new Mpdf([
+            'mode'             => 'utf-8',
+            'format'           => 'A4-P',
+            'margin_left'      => 5,
+            'margin_right'     => 5,
+            'margin_top'       => 5,
+            'margin_bottom'    => 5,
+            'fontDir'          => array_merge($fontDirs, [storage_path('fonts')]),
+            'fontdata'         => array_merge($fontData, [
+                'vazirmatn' => [
+                    'R'         => 'Vazirmatn-Regular.ttf',
+                    'B'         => 'Vazirmatn-Bold.ttf',
+                    'useOTL'    => 0xFF,
+                    'useKashida' => 75,
+                ]
+            ]),
+            'default_font'     => 'vazirmatn',
+            'autoLangToFont'   => true,
+            'autoScriptToLang' => true,
+        ]);
+
+        $mpdf->SetDirectionality('rtl');
+
+        // Render our new Blade PDF template
+        $html = view('admin.ballots-pdf', compact('session', 'ballots'))->render();
+        $mpdf->WriteHTML($html);
+
+        $filename = "ballots_session_{$session->id}.pdf";
+        $output   = $mpdf->Output($filename, 'S');
+
+        return response($output, 200)
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', "attachment; filename=\"{$filename}\"");
     }
 }

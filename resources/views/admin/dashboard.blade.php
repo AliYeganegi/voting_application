@@ -57,7 +57,7 @@
                             @endif
                         </div>
 
-                    {{-- 2) ENDED SESSION --}}
+                        {{-- 2) ENDED SESSION --}}
                     @elseif($session->start_at && $session->end_at)
                         <div class="alert alert-secondary text-center">
                             <h4>رأی‌گیری به پایان رسید</h4>
@@ -89,12 +89,9 @@
                                     {{-- session name --}}
                                     <div class="mb-2">
                                         <label class="form-label">نام جلسه</label>
-                                        <input type="text"
-                                               name="name"
-                                               class="form-control"
-                                               placeholder="مثلاً جلسه عمومی"
-                                               value="{{ old('name') }}"
-                                               {{ $canStart ? '' : 'disabled' }}>
+                                        <input type="text" name="name" class="form-control"
+                                            placeholder="مثلاً جلسه عمومی" value="{{ old('name') }}"
+                                            {{ $canStart ? '' : 'disabled' }}>
                                     </div>
 
                                     <button class="btn btn-success w-100" {{ $canStart ? '' : 'disabled' }}>
@@ -109,7 +106,7 @@
                             @endif
                         </div>
 
-                    {{-- 3) NEVER‑STARTED STUB SESSION --}}
+                        {{-- 3) NEVER‑STARTED STUB SESSION --}}
                     @else
                         <div class="alert alert-warning text-center">
                             <h4>جلسه ایجاد شده اما شروع نشده است</h4>
@@ -135,12 +132,9 @@
                                     {{-- session name --}}
                                     <div class="mb-2">
                                         <label class="form-label">نام جلسه</label>
-                                        <input type="text"
-                                               name="name"
-                                               class="form-control"
-                                               placeholder="مثلاً جلسه عمومی"
-                                               value="{{ old('name', $session->name) }}"
-                                               {{ $canStart ? '' : 'disabled' }}>
+                                        <input type="text" name="name" class="form-control"
+                                            placeholder="مثلاً جلسه عمومی" value="{{ old('name', $session->name) }}"
+                                            {{ $canStart ? '' : 'disabled' }}>
                                     </div>
 
                                     <button class="btn btn-success w-100" {{ $canStart ? '' : 'disabled' }}>
@@ -156,7 +150,7 @@
                         </div>
                     @endif
 
-                {{-- NO SESSION AT ALL --}}
+                    {{-- NO SESSION AT ALL --}}
                 @else
                     <div class="alert alert-warning text-center">
                         <h4>رأی‌گیری فعال نیست</h4>
@@ -177,12 +171,8 @@
                                 {{-- session name --}}
                                 <div class="mb-2">
                                     <label class="form-label">نام جلسه</label>
-                                    <input type="text"
-                                           name="name"
-                                           class="form-control"
-                                           placeholder="مثلاً جلسه عمومی"
-                                           value="{{ old('name') }}"
-                                           {{ $canStart ? '' : 'disabled' }}>
+                                    <input type="text" name="name" class="form-control" placeholder="مثلاً جلسه عمومی"
+                                        value="{{ old('name') }}" {{ $canStart ? '' : 'disabled' }} required>
                                 </div>
 
                                 <button class="btn btn-success w-100" {{ $canStart ? '' : 'disabled' }}>
@@ -204,6 +194,16 @@
                         <form action="{{ route('admin.importVoters') }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <label class="form-label">فایل اکسل رأی‌دهندگان</label>
+                            <!-- VOTERS Excel Instructions -->
+                            <small class="text-muted d-block">
+                                فرمت فایل اکسل رأی‌دهندگان باید شامل ستون‌های زیر باشد:
+                                <ul class="small ps-3">
+                                    <li><code>نام</code> (مثال: علی)</li>
+                                    <li><code>نام خانوادگی</code> (مثال: رضایی)</li>
+                                    <li><code>شماره ملی</code> (مثال: 0012345678)</li>
+                                    <li><code>شماره پروانه</code> (اختیاری)</li>
+                                </ul>
+                            </small>
                             <input type="file" name="file" class="form-control mb-2" required>
                             <button class="btn btn-primary w-100">وارد کردن رأی‌دهندگان</button>
                         </form>
@@ -218,6 +218,16 @@
                         <form action="{{ route('admin.importCandidates') }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <label class="form-label">فایل اکسل نامزدها</label>
+                            <!-- CANDIDATES Excel Instructions -->
+                            <small class="text-muted d-block">
+                                فرمت فایل اکسل نامزدها باید شامل ستون‌های زیر باشد:
+                                <ul class="small ps-3">
+                                    <li><code>نام</code> (مثال: نسرین)</li>
+                                    <li><code>نام خانوادگی</code> (مثال: احمدی)</li>
+                                    <li><code>کدملی</code> (مثال: 0098765432)</li>
+                                    <li><code>شما ره پروانه</code> (اختیاری)</li>
+                                </ul>
+                            </small>
                             <input type="file" name="file" class="form-control mb-2" required>
                             <button class="btn btn-primary w-100">وارد کردن نامزدها</button>
                         </form>
@@ -236,8 +246,10 @@
                     <div class="col-md-6 mb-3">
                         <label class="form-label">
                             آپلود تصاویر نامزدها (ZIP)<br>
-                            <small class="text-muted d-block mb-1">
-                                نام فایل‌ها باید <code>national_id.jpg</code> باشد.
+                            <!-- Candidate Images ZIP Instructions -->
+                            <small class="text-muted d-block">
+                                فایل ZIP باید شامل تصاویر با نام <code>کدملی.jpg</code> برای هر نامزد باشد.<br>
+                                مثال: <code>0098765432.jpg</code>
                             </small>
                         </label>
                         <form action="{{ route('admin.uploadCandidateImages') }}" method="POST"
