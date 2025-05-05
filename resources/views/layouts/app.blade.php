@@ -21,7 +21,7 @@
             <div class="container">
 
                 <a class="navbar-brand d-flex align-items-center" href="{{ url('/') }}">
-                    <img src="{{ asset('storage/logo/logo.jpg') }}" alt="Logo" style="height: 50px; width: 70px;"
+                    <img src="{{ asset('storage/logo/logo.jpg') }}" alt="Logo" style="height: 70px; width: 70px;"
                         class="me-2">
                 </a>
 

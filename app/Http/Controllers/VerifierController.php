@@ -82,6 +82,15 @@ class VerifierController extends Controller
             return back()->withErrors(['voter_id' => 'صف تأیید پر است. لطفاً صبر کنید.']);
         }
 
+        $alreadyInQueue = Verification::where('voting_session_id', $session->id)
+            ->where('voter_hash', $voterHash)
+            ->where('status', 'pending')
+            ->exists();
+
+        if ($alreadyInQueue) {
+            return back()->withErrors(['voter_id' => 'کد ملی در صف وجود دارد.']);
+        }
+
         // 7) Add to queue
         Verification::create([
             'voting_session_id' => $session->id,

@@ -12,35 +12,35 @@ class UserSeeder extends Seeder
     public function run()
     {
         User::create([
-            'name' => 'Operator 1',
+            'name' => 'اپراتور ۱',
             'email' => 'op1@example.com',
             'password' => Hash::make('password1'),
             'is_operator' => true,
         ]);
 
         User::create([
-            'name' => 'Operator 2',
+            'name' => 'اپراتور ۲',
             'email' => 'op2@example.com',
             'password' => Hash::make('password2'),
             'is_operator' => true,
         ]);
 
         User::create([
-            'name' => 'Operator 3',
+            'name' => 'اپراتور ۳',
             'email' => 'op3@example.com',
             'password' => Hash::make('password3'),
             'is_operator' => true,
         ]);
 
         User::create([
-            'name' => 'Verifier 1',
+            'name' => 'تایید کننده ۱',
             'email' => 'vrf1@example.com',
             'password' => Hash::make('password4'),
             'is_verifier' => true,
         ]);
 
         User::create([
-            'name' => 'admin',
+            'name' => 'ادمین',
             'email' => 'admin@example.com',
             'password' => Hash::make('admin'),
             'is_operator' => true,
