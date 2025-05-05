@@ -2,7 +2,7 @@
 @section('content')
     <div class="container">
         <h1 class="text-center mb-2">
-            برگ‌های رأی جلسه {{ ($session->name) }}
+            برگ‌های رأی جلسه {{ $session->name }}
         </h1>
         <h4 class="text-center mb-4">
             {{ jdate($session->start_at)->format('H:i:s Y/m/d') }} - {{ jdate($session->end_at)->format('H:i:s Y/m/d') }}
@@ -19,17 +19,26 @@
                     — {{ jdate($ballot->created_at)->format('H:i:s Y/m/d') }}
                 </div>
                 <ul class="list-group list-group-flush">
-                    @foreach ($ballot->candidates as $cand)
+                    @if (is_null($ballot->candidates) || $ballot->candidates->isEmpty())
                         <li class="list-group-item d-flex align-items-center">
-                            <img src="{{ asset('storage/candidates/' . $cand->profile_image) }}" class="rounded-circle me-3"
-                                style="width:50px;height:50px;object-fit:cover;" alt="{{ $cand->name }}">
                             <div>
-                                <strong>{{ $cand->name }}</strong><br>
-                                <small>کد ملی: {{ $cand->national_id }}</small><br>
-                                <small>شماره پروانه: {{ $cand->license_number }}</small>
+                                <strong>رای سفید</strong>
                             </div>
                         </li>
-                    @endforeach
+                    @else
+                        @foreach ($ballot->candidates as $cand)
+                            <li class="list-group-item d-flex align-items-center">
+                                <img src="{{ asset('storage/candidates/' . $cand->profile_image) }}"
+                                    class="rounded-circle me-3" style="width:50px;height:50px;object-fit:cover;"
+                                    alt="{{ $cand->name }}">
+                                <div>
+                                    <strong>{{ $cand->name }}</strong><br>
+                                    <small>کد ملی: {{ $cand->national_id }}</small><br>
+                                    <small>شماره پروانه: {{ $cand->license_number }}</small>
+                                </div>
+                            </li>
+                        @endforeach
+                    @endif
                 </ul>
             </div>
         @empty

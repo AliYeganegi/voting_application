@@ -7,27 +7,27 @@
     @forelse ($sessions as $session)
         <div class="card mb-4">
             <div class="card-header">
-                جلسه #{{ $session->id }}
+                جلسه {{ $session->name }}
             </div>
             <div class="card-body">
-                <p><strong>شروع:</strong> {{ $session->start_at ?? '—' }}</p>
-                <p><strong>پایان:</strong> {{ $session->end_at ?? '—' }}</p>
+                <p><strong>شروع:</strong> {{ jdate($session->start_at)->format('H:i:s Y/m/d') ?? '—' }}</p>
+                <p><strong>پایان:</strong> {{ jdate($session->end_at)->format('H:i:s Y/m/d') ?? '—' }}</p>
 
                 <h5 class="mt-3">تأیید شروع:</h5>
                 <ul>
                     @forelse ($session->startApprovals as $a)
-                        <li>{{ $a->operator->name }} — {{ jdate($a->created_at->format('Y/m/d H:i:s')) }}</li>
+                        <li>{{ $a->operator->name }} — {{ jdate($a->created_at)->format('Y/m/d H:i:s') }}</li>
                     @empty
-                        <li class="text-muted">بدون تأیید</li>
+                        <li class="">Admin — {{ jdate($a->created_at)->format('Y/m/d H:i:s') }}</li>
                     @endforelse
                 </ul>
 
                 <h5 class="mt-3">تأیید پایان:</h5>
                 <ul>
                     @forelse ($session->endApprovals as $a)
-                        <li>{{ $a->operator->name }} — {{ jdate($a->created_at->format('Y/m/d H:i:s')) }}</li>
+                        <li>{{ $a->operator->name }} — {{ jdate($a->created_at)->format('Y/m/d H:i:s') }}</li>
                     @empty
-                        <li class="text-muted">بدون تأیید</li>
+                        <li class="">Admin — {{ jdate($a->created_at)->format('Y/m/d H:i:s') }}</li>
                     @endforelse
                 </ul>
             </div>

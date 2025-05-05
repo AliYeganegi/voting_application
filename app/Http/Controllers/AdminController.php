@@ -124,7 +124,13 @@ class AdminController extends Controller
         }
 
         // 7) Create new session
-        VotingSession::create($payload);
+        $session = VotingSession::create($payload);
+
+        OperatorApproval::create([
+            'voting_session_id' => $session->id,
+            'operator_id'       => Auth::id(),
+            'action'              => 'start',
+        ]);
 
         return back()->with('success', 'رأی‌گیری شروع شد');
     }
@@ -140,6 +146,17 @@ class AdminController extends Controller
             'is_active' => false,
             'end_at'   => now(),
         ]);
+
+        OperatorApproval::create([
+            'voting_session_id' => $session->id,
+            'operator_id'       => Auth::id(),
+            'action'              => 'end',
+        ]);
+
+        $endApps = $session
+        ->endApprovals()
+        ->with('operator')
+        ->get();
 
         // 2) Gather results
         $results = User::where('is_candidate', true)
@@ -178,7 +195,7 @@ class AdminController extends Controller
         $mpdf->SetDirectionality('rtl');
 
         // 5) Render your Blade view (with your fixed RTL styling)
-        $html = view('admin.results-pdf-fixed', compact('results', 'session'))->render();
+        $html = view('admin.results-pdf-fixed', compact('results', 'session', 'endApps'))->render();
         $mpdf->WriteHTML($html);
 
         // 6) Output to string and store

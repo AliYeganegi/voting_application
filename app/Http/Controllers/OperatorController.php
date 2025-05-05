@@ -83,6 +83,11 @@ class OperatorController extends Controller
             'action'              => 'end',
         ]);
 
+        $endApps = $session
+            ->endApprovals()
+            ->with('operator')
+            ->get();
+
         if ($session->endApprovals()->count() >= 3) {
             $session->update([
                 'is_active' => false,
@@ -125,7 +130,7 @@ class OperatorController extends Controller
             $mpdf->SetDirectionality('rtl');
 
             // 5) Render your Blade view (with your fixed RTL styling)
-            $html = view('admin.results-pdf-fixed', compact('results', 'session'))->render();
+            $html = view('admin.results-pdf-fixed', compact('results', 'session', 'endApps'))->render();
             $mpdf->WriteHTML($html);
 
             // 6) Output to string and store
