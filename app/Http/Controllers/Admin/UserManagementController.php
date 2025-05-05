@@ -6,29 +6,34 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class UserManagementController extends Controller
 {
     public function index(Request $request)
     {
-        // show all operators & verifiers (but not admins)
-        $users = User::where('is_admin', false)
-            ->orderBy('name')
-            ->paginate(10);
-
-        $query = User::query();
+        $query = User::where('is_admin', false)->orderBy('created_at', 'desc');
 
         if ($search = $request->input('search')) {
-            $normalizedSearch = preg_replace('/\s+/', ' ', trim($search));
+            // Normalize the search input
+            $normalizedSearch = preg_replace('/\s+/', ' ', trim($search)); // replaces multiple whitespace with single space
 
-            $query->where(function ($q) use ($normalizedSearch) {
-                $q->where('name', 'like', "%{$normalizedSearch}%")
-                  ->orWhere('email', 'like', "%{$normalizedSearch}%");
+            // Convert the search term into individual words
+            $words = explode(' ', $normalizedSearch);
+
+            // Apply search filter for each word
+            $query->where(function ($q) use ($words) {
+                foreach ($words as $word) {
+                    $q->where(function ($subQuery) use ($word) {
+                        $subQuery->where(DB::raw("REPLACE(REPLACE(name, CHAR(160), ' '), CHAR(8207), ' ')"), 'like', "%{$word}%")
+                                 ->orWhere(DB::raw("REPLACE(REPLACE(email, CHAR(160), ' '), CHAR(8207), ' ')"), 'like', "%{$word}%");
+                    });
+                }
             });
-
-            $users = $query->paginate(10)->withQueryString();
         }
+
+        $users = $query->paginate(10)->withQueryString();
 
         return view('admin.users.index', compact('users'));
     }

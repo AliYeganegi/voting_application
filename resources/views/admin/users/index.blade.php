@@ -14,11 +14,17 @@
             ایجاد کاربر جدید
         </a>
 
-        <form method="GET" action="{{ route('users.index') }}" class="mb-4 d-flex">
-            <input type="text" name="search" class="form-control me-2" placeholder="جستجوی نام یا ایمیل"
-                value="{{ request('search') }}">
-            <button type="submit" class="btn btn-outline-primary">جستجو</button>
+        <form method="GET" action="{{ route('users.index') }}" class="mb-4 d-flex justify-content-start align-items-center gap-2" dir="rtl">
+            <input type="text" name="search" class="form-control w-auto" style="min-width: 250px"
+                   placeholder="جستجوی نام یا ایمیل"
+                   value="{{ request('search') }}">
+
+            <button type="submit" class="btn btn-primary d-flex align-items-center gap-1">
+                <i class="bi bi-search"></i> {{-- Requires Bootstrap Icons --}}
+                <span>جستجو</span>
+            </button>
         </form>
+
 
         <table class="table table-bordered table-striped">
             <thead class="table-light">
