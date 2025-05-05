@@ -171,7 +171,7 @@ class OperatorController extends Controller
         $sessions = VotingSession::with([
             'startApprovals.operator',
             'endApprovals.operator'
-        ])->orderByDesc('id')->get();
+        ])->orderByDesc('id')->paginate(10);
 
         return view('operator.history', compact('sessions'));
     }

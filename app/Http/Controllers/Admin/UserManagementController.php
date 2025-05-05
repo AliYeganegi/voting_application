@@ -10,12 +10,25 @@ use Illuminate\Support\Facades\Hash;
 
 class UserManagementController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         // show all operators & verifiers (but not admins)
         $users = User::where('is_admin', false)
-                     ->orderBy('name')
-                     ->paginate(20);
+            ->orderBy('name')
+            ->paginate(10);
+
+        $query = User::query();
+
+        if ($search = $request->input('search')) {
+            $normalizedSearch = preg_replace('/\s+/', ' ', trim($search));
+
+            $query->where(function ($q) use ($normalizedSearch) {
+                $q->where('name', 'like', "%{$normalizedSearch}%")
+                  ->orWhere('email', 'like', "%{$normalizedSearch}%");
+            });
+
+            $users = $query->paginate(10)->withQueryString();
+        }
 
         return view('admin.users.index', compact('users'));
     }
@@ -45,11 +58,11 @@ class UserManagementController extends Controller
         User::create($data);
 
         $users = User::where('is_admin', false)
-        ->orderBy('name')
-        ->paginate(20);
+            ->orderBy('name')
+            ->paginate(10);
 
         return view('admin.users.index', compact('users'))
-                         ->with('success', 'کاربر با موفقیت ایجاد شد.');
+            ->with('success', 'کاربر با موفقیت ایجاد شد.');
     }
 
     public function edit(User $user)
@@ -80,11 +93,11 @@ class UserManagementController extends Controller
         $user->update($data);
 
         $users = User::where('is_admin', false)
-        ->orderBy('name')
-        ->paginate(20);
+            ->orderBy('name')
+            ->paginate(10);
 
         return view('admin.users.index', compact('users'))
-                         ->with('success', 'اطلاعات کاربر با موفقیت به‌روز شد.');
+            ->with('success', 'اطلاعات کاربر با موفقیت به‌روز شد.');
     }
 
     public function destroy(User $user)
