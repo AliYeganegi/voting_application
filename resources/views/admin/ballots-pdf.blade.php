@@ -58,7 +58,7 @@
             border: 1px solid #000;
             padding: 2px;
             border: 1px solid #000;
-            padding: 2px;
+            padding: 14px;
             text-align: center;
             vertical-align: middle;
         }
@@ -68,10 +68,12 @@
         }
 
         img {
-            width: 20px;
-            height: 20px;
+            width: 40px;
+            height: 40px;
             object-fit: cover;
             border-radius: 50%;
+            display: block;
+            margin: 0 auto;
         }
 
         .header {
@@ -90,28 +92,46 @@
             font-size: 8pt;
             margin-top: 5px;
         }
+
+        .candidate-img {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            /* crop to fill the square */
+            border-radius: 50%;
+            /* make it round */
+            overflow: hidden;
+            /* clip any overflow */
+            display: block;
+            margin: 0 auto;
+        }
     </style>
 </head>
 
 <body>
 
-    <div class="header">
-        <img class="logo" src="{{ public_path('storage/logo/logo.jpg') }}" alt="Logo">
-
-        <h1>{{ $session->name }}</h1>
-
-        <h1>برگه‌های رأی</h1>
-
-        <div class="times">
-            <p>شروع: {{ jdate($session->start_at)->format('H:i Y/m/d') }} - پایان: {{ jdate($session->end_at)->format('H:i Y/m/d') }}</p>
-        </div>
-    </div>
-
     @foreach ($ballots as $ballot)
+        <div class="header">
+            <img class="logo" src="{{ public_path('storage/logo/logo.jpg') }}" alt="Logo">
+
+            <h1>{{ $session->name }}</h1>
+
+            <h1>برگه‌های رأی</h1>
+
+            <div class="times">
+                <p>شروع: {{ jdate($session->start_at)->format('H:i Y/m/d') }} - پایان:
+                    {{ jdate($session->end_at)->format('H:i Y/m/d') }}</p>
+            </div>
+        </div>
         <div class="ballot">
             <div class="ballot-header">
                 برگه رأی شماره {{ $loop->iteration }}
                 — {{ jdate($ballot->created_at)->format('H:i:s Y/m/d') }}
+            </div>
+            <div style="text-align: center; margin-bottom: 30px;">
+                <div style="text-align: center;">
+                    {{$ballot->voter_hash}}
+                </div>
             </div>
             <table>
                 <thead>
@@ -125,14 +145,23 @@
                 <tbody>
                     @if (is_null($ballot->candidates) || $ballot->candidates->isEmpty())
                         <tr>
-                            <td colspan="4" style="text-align: center;"><strong>رأی سفید</strong></td>
+                            <td colspan="4" style="text-align: center; font-size: 24px;"><strong>رأی سفید</strong>
+                            </td>
                         </tr>
                     @else
                         @foreach ($ballot->candidates as $cand)
                             <tr>
+                                @php
+
+                                    $imageData = base64_encode(
+                                        file_get_contents(
+                                            storage_path('app/public/candidates/' . $cand->profile_image),
+                                        ),
+                                    );
+                                @endphp
                                 <td>
-                                    <img src="{{ storage_path('app/public/candidates/' . $cand->profile_image) }}"
-                                        alt="{{ $cand->name }}">
+                                    <img class="candidate-img" src="data:image/jpeg;base64,{{ $imageData }}"
+                                        alt="Candidate Image">
                                 </td>
                                 <td>{{ $cand->name }}</td>
                                 <td>{{ $cand->national_id }}</td>
@@ -143,6 +172,8 @@
                 </tbody>
             </table>
         </div>
+        {{-- Page break before results --}}
+        <div style="page-break-before: always;"></div>
     @endforeach
 </body>
 

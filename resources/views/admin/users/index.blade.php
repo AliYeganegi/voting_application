@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('content')
     <div class="container">
-        <h1 class="mb-4 text-center">مدیریت اپراتورها و تأییدکنندگان</h1>
+        <h1 class="mb-4 text-center">مدیریت هیئت نظارت و تأییدکنندگان</h1>
 
         @if (session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
@@ -31,8 +31,9 @@
                 <tr>
                     <th>نام</th>
                     <th>ایمیل</th>
-                    <th>اپراتور</th>
+                    <th>هیئت نظارت</th>
                     <th>تأییدکننده</th>
+                    <th>رای دهنده</th>
                     <th>عملیات</th>
                 </tr>
             </thead>
@@ -48,6 +49,11 @@
                         </td>
                         <td class="text-center">
                             @if ($user->is_verifier)
+                                <span class="badge bg-info">بلی</span>
+                            @endif
+                        </td>
+                        <td class="text-center">
+                            @if ($user->is_voter)
                                 <span class="badge bg-info">بلی</span>
                             @endif
                         </td>

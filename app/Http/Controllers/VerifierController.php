@@ -97,7 +97,7 @@ class VerifierController extends Controller
             'voter_id'          => $data['voter_id'],
             'voter_hash'        => $voterHash,
             'started_at'        => now(),
-            'expires_at'        => now()->addMinutes(15),
+            'expires_at'        => now()->addMinutes(20),
             'status'            => 'pending',
         ]);
 

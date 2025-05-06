@@ -26,7 +26,8 @@ class User extends Authenticatable
         'profile_image',
         'is_candidate',
         'is_operator',
-        'is_verifier'
+        'is_verifier',
+        'is_voter',
     ];
 
 

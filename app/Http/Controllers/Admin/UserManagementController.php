@@ -53,10 +53,12 @@ class UserManagementController extends Controller
             'password'    => 'required|string|min:8|confirmed',
             'is_operator' => '',
             'is_verifier' => '',
+            'is_voter'    => '',
         ]);
 
         $data['is_operator'] = $request->has('is_operator') ? 1 : 0;
         $data['is_verifier'] = $request->has('is_verifier') ? 1 : 0;
+        $data['is_voter'] = $request->has('is_voter') ? 1 : 0;
 
         $data['password'] = Hash::make($data['password']);
 
@@ -83,11 +85,14 @@ class UserManagementController extends Controller
             'password'    => 'nullable|string|min:8|confirmed',
             'is_operator' => '',
             'is_verifier' => '',
+            'is_voter'    => '',
         ]);
 
         // Convert checkboxes to 1/0
         $data['is_operator'] = $request->has('is_operator') ? 1 : 0;
         $data['is_verifier'] = $request->has('is_verifier') ? 1 : 0;
+        $data['is_operator'] = $request->has('is_operator') ? 1 : 0;
+        $data['is_voter'] = $request->has('is_voter') ? 1 : 0;
 
         if ($data['password'] ?? false) {
             $data['password'] = Hash::make($data['password']);

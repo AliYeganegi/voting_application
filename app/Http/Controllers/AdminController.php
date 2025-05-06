@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Mpdf\Mpdf;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use ZipArchive;
 
 
@@ -154,9 +155,9 @@ class AdminController extends Controller
         ]);
 
         $endApps = $session
-        ->endApprovals()
-        ->with('operator')
-        ->get();
+            ->endApprovals()
+            ->with('operator')
+            ->get();
 
         // 2) Gather results
         $results = User::where('is_candidate', true)

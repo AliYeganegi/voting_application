@@ -69,12 +69,14 @@
                                     </a> --}}
 
                                     {{-- Delete session --}}
-                                    <form action="{{ route('admin.sessions.destroy', $sess->id) }}" method="POST"
-                                        onsubmit="return confirm('آیا مطمئن به حذف این جلسه هستید؟');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="btn btn-sm btn-danger">حذف</button>
-                                    </form>
+                                    @unless (!auth()->user()->is_admin)
+                                        <form action="{{ route('admin.sessions.destroy', $sess->id) }}" method="POST"
+                                            onsubmit="return confirm('آیا مطمئن به حذف این جلسه هستید؟');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="btn btn-sm btn-danger">حذف</button>
+                                        </form>
+                                    @endunless
                                 @else
                                     <span class="text-muted">در دسترس نیست</span>
                                 @endif

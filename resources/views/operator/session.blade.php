@@ -3,7 +3,7 @@
 
 @section('content')
     <div class="container">
-        <h1 class="mb-4 text-center">پنل اپراتور</h1>
+        <h1 class="mb-4 text-center">پنل هیئت نظارت</h1>
 
         @if(session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
@@ -73,7 +73,7 @@
                             <h4>تأیید شروع رأی‌گیری</h4>
                             <p>
                                 <strong>{{ $startApps->count() }} / 3</strong>
-                                اپراتور تأیید کرده‌اند
+                                هیئت نظارت تأیید کرده‌اند
                             </p>
                             <ul>
                                 @foreach ($startApps as $app)
@@ -102,7 +102,7 @@
                             <h4>تأیید پایان رأی‌گیری</h4>
                             <p>
                                 <strong>{{ $endApps->count() }} / 3</strong>
-                                اپراتور تأیید کرده‌اند
+                                هیئت نظارت تأیید کرده‌اند
                             </p>
                             <ul>
                                 @foreach ($endApps as $app)

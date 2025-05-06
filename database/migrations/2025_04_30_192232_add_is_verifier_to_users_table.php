@@ -9,6 +9,7 @@ return new class extends Migration {
     {
         Schema::table('users', function (Blueprint $table) {
             $table->boolean('is_verifier')->default(false)->after('is_operator');
+            $table->boolean('is_voter')->default(false)->after('is_verifier');
         });
     }
 
@@ -16,6 +17,7 @@ return new class extends Migration {
     {
         Schema::table('users', function (Blueprint $table) {
             $table->dropColumn('is_verifier');
+            $table->dropColumn('is_voter');
         });
     }
 };

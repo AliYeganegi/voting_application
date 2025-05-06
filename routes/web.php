@@ -74,6 +74,8 @@ Route::middleware(['auth', OperatorMiddleware::class])->prefix('operator')->grou
         ->name('vote.submit');
 
     Route::get('/operator/history', [OperatorController::class, 'history'])->name('operator.history');
+
+    // Removed duplicate operator routes since they can now access the admin routes
 });
 
 /*
@@ -97,19 +99,19 @@ Route::middleware(['auth', VerifierMiddleware::class])
 | - Session listing, results, ballots, imports, user‑mgmt
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', AdminMiddleware::class])
+Route::middleware(['auth'])
     ->prefix('admin')
     ->group(function () {
-        // Dashboard
-        Route::get('dashboard', [AdminController::class, 'dashboard'])
-            ->name('admin.dashboard');
+        // Dashboard - Admin only
+        Route::middleware([AdminMiddleware::class])->group(function() {
+            Route::get('dashboard', [AdminController::class, 'dashboard'])
+                ->name('admin.dashboard');
+            Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
 
-        Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-
-
-        // Direct start / stop
-        Route::post('start', [AdminController::class, 'startVoting'])->name('admin.start');
-        Route::post('stop',  [AdminController::class, 'endVoting'])->name('admin.stop');
+            // Direct start / stop - Admin only
+            Route::post('start', [AdminController::class, 'startVoting'])->name('admin.start');
+            Route::post('stop',  [AdminController::class, 'endVoting'])->name('admin.stop');
+        });
 
         // Export Excel
         Route::get('export', [AdminController::class, 'exportResults'])
@@ -118,7 +120,7 @@ Route::middleware(['auth', AdminMiddleware::class])
         // Sessions index & destroy
         Route::get('sessions',                [AdminController::class, 'previousSessions'])
             ->name('admin.sessions');
-        Route::delete('sessions/{session}',  [VotingSessionController::class, 'destroy'])
+        Route::middleware([AdminMiddleware::class])->delete('sessions/{session}',  [VotingSessionController::class, 'destroy'])
             ->name('admin.sessions.destroy');
 
         // Per‑session results, PDF & ballots
@@ -129,18 +131,20 @@ Route::middleware(['auth', AdminMiddleware::class])
         Route::get('sessions/{session}/ballots',     [AdminController::class, 'viewBallots'])
             ->name('admin.sessions.ballots');
 
-        // Excel imports
-        Route::post('import-voters',     [VoterImportController::class, 'importVoters'])
-            ->name('admin.importVoters');
-        Route::post('import-candidates', [VoterImportController::class, 'importCandidates'])
-            ->name('admin.importCandidates');
+        // Excel imports - Admin only
+        Route::middleware([AdminMiddleware::class])->group(function() {
+            Route::post('import-voters',     [VoterImportController::class, 'importVoters'])
+                ->name('admin.importVoters');
+            Route::post('import-candidates', [VoterImportController::class, 'importCandidates'])
+                ->name('admin.importCandidates');
 
-        // User management
-        Route::resource('users', UserManagementController::class)
-            ->except(['show']);
+            // User management - Admin only
+            Route::resource('users', UserManagementController::class)
+                ->except(['show']);
 
-        Route::post('/upload-candidate-images', [AdminController::class, 'uploadCandidateImages'])
-            ->name('admin.uploadCandidateImages');
+            Route::post('/upload-candidate-images', [AdminController::class, 'uploadCandidateImages'])
+                ->name('admin.uploadCandidateImages');
+        });
 
         Route::get('/sessions/{session}/ballots/pdf', [AdminController::class, 'downloadBallotsPdf'])
             ->name('admin.sessions.ballots.pdf');

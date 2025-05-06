@@ -34,16 +34,21 @@
                     {{-- Right side (role‑based) --}}
                     <ul class="navbar-nav me-auto">
                         @auth
-                            {{-- Operators --}}
-                            @if (auth()->user()->is_operator)
+                            {{-- Admin --}}
+                            @if (auth()->user()->is_admin)
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('vote.index') }}">
                                         رأی‌دهی
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('operator.session') }}">
-                                        پنل اپراتور
+                                    <a class="nav-link" href="{{ route('admin.dashboard') }}">
+                                        پنل مدیریت
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('users.index') }}">
+                                        مدیریت کاربران
                                     </a>
                                 </li>
                             @endif
@@ -57,11 +62,11 @@
                                 </li>
                             @endif
 
-                            {{-- Admin --}}
-                            @if (auth()->user()->is_admin)
+                            {{-- Operators --}}
+                            @if (auth()->user()->is_operator)
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('admin.dashboard') }}">
-                                        پنل مدیریت
+                                    <a class="nav-link" href="{{ route('operator.session') }}">
+                                        هیئت نظارت
                                     </a>
                                 </li>
                                 <li class="nav-item">
@@ -69,12 +74,15 @@
                                         نتایج جلسات
                                     </a>
                                 </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('users.index') }}">
-                                        مدیریت کاربران
-                                    </a>
-                                </li>
                             @endif
+
+                            {{-- voter --}}
+                            {{-- @if (auth()->user()->is_voter)
+                                <a class="nav-link" href="{{ route('vote.index') }}">
+                                    رأی‌دهی
+                                </a>
+                                </li>
+                            @endif --}}
 
                             {{-- Notifications --}}
                             @php $unreads = auth()->user()->unreadNotifications; @endphp

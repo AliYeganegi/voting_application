@@ -37,8 +37,8 @@
 
                         {{-- end‑approvals --}}
                         <div class="border rounded p-3 mb-3">
-                            <h5>تأیید پایان رأی‌گیری توسط اپراتورها</h5>
-                            <p><strong>{{ $endApps->count() }} / 3</strong> اپراتور تأیید کرده‌اند</p>
+                            <h5>تأیید پایان رأی‌گیری توسط هیئت نظارت</h5>
+                            <p><strong>{{ $endApps->count() }} / 3</strong> هیئت نظارت تأیید کرده‌اند</p>
                             <ul class="mb-3">
                                 @foreach ($endApps as $app)
                                     <li>
@@ -70,8 +70,8 @@
                         </div>
 
                         <div class="border rounded p-3 mb-3">
-                            <h5>تأیید پایان رأی‌گیری توسط اپراتورها</h5>
-                            <p><strong>{{ $endApps->count() }} / 3</strong> اپراتور تأیید کرده‌اند</p>
+                            <h5>تأیید پایان رأی‌گیری توسط هیئت نظارت</h5>
+                            <p><strong>{{ $endApps->count() }} / 3</strong> هیئت نظارت تأیید کرده‌اند</p>
                             <ul class="mb-3">
                                 @foreach ($endApps as $app)
                                     <li>
@@ -110,12 +110,12 @@
                     @else
                         <div class="alert alert-warning text-center">
                             <h4>جلسه ایجاد شده اما شروع نشده است</h4>
-                            <p>اپراتورها هنوز تأیید شروع را تکمیل نکرده‌اند.</p>
+                            <p>هیئت نظارت هنوز تأیید شروع را تکمیل نکرده‌اند.</p>
                         </div>
 
                         <div class="border rounded p-3 mb-3">
-                            <h5>تأیید شروع رأی‌گیری توسط اپراتورها</h5>
-                            <p><strong>{{ $startApps->count() }} / 3</strong> اپراتور تأیید کرده‌اند</p>
+                            <h5>تأیید شروع رأی‌گیری توسط هیئت نظارت</h5>
+                            <p><strong>{{ $startApps->count() }} / 3</strong> هیئت نظارت تأیید کرده‌اند</p>
                             <ul class="mb-3">
                                 @foreach ($startApps as $app)
                                     <li>
@@ -156,8 +156,8 @@
                         <h4>رأی‌گیری فعال نیست</h4>
                     </div>
                     <div class="border rounded p-3 mb-3">
-                        <h5>تأیید شروع رأی‌گیری توسط اپراتورها</h5>
-                        <p><strong>{{ $startApps->count() }} / 3</strong> اپراتور تأیید کرده‌اند</p>
+                        <h5>تأیید شروع رأی‌گیری توسط هیئت نظارت</h5>
+                        <p><strong>{{ $startApps->count() }} / 3</strong> هیئت نظارت تأیید کرده‌اند</p>
                         <ul class="mb-3">
                             @foreach ($startApps as $app)
                                 <li>{{ $app->operator->name }} — {{ $app->created_at->format('H:i:s') }}</li>
