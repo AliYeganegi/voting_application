@@ -139,6 +139,7 @@
             <thead>
                 <tr>
                     <th>هیئت نظارت</th>
+                    <th>کد ملی</th>
                     <th>تاریخ و ساعت تأیید</th>
                     <th>امضا</th>
                 </tr>
@@ -147,6 +148,7 @@
                 @foreach ($endApps as $app)
                     <tr>
                         <td>{{ $app->operator->name }}</td>
+                        <td>{{ $app->operator->national_id}}</td>
                         <td>{{ jdate($app->created_at)->format('H:i Y/m/d') }}</td>
                         <td>__________________</td>
                     </tr>

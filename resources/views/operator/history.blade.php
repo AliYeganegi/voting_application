@@ -27,7 +27,7 @@
                         @forelse ($session->endApprovals as $a)
                             <li>{{ $a->operator->name }} — {{ jdate($a->created_at)->format('Y/m/d H:i:s') }}</li>
                         @empty
-                            <li class="">Admin — {{ jdate($a->created_at)->format('Y/m/d H:i:s') }}</li>
+                            <li class="">—</li>
                         @endforelse
                     </ul>
                 </div>

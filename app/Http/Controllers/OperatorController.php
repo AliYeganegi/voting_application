@@ -25,13 +25,15 @@ class OperatorController extends Controller
         $endApps           = optional($session)->endApprovals   ?? collect();
         $lastVoterFile     = ImportFile::where('type', 'voters')->latest()->first();
         $lastCandidateFile = ImportFile::where('type', 'candidates')->latest()->first();
+        $operators = User::where('is_operator' , 1)->get();
 
         return view('operator.session', compact(
             'session',
             'startApps',
             'endApps',
             'lastVoterFile',
-            'lastCandidateFile'
+            'lastCandidateFile',
+            'operators',
         ));
     }
 
@@ -55,8 +57,11 @@ class OperatorController extends Controller
             'action'              => 'start',
         ]);
 
+        $operators = User::where('is_operator')->get();
+        $numberOfOperators = count($operators);
+
         // if now ≥3 approvals, flip session active
-        if ($session->startApprovals()->count() >= 3) {
+        if ($session->startApprovals()->count() >= $numberOfOperators - 1) {
             $session->update([
                 'is_active' => true,
                 'start_at'  => now(),

@@ -18,16 +18,24 @@ class VoteController extends Controller
 {
     public function index()
     {
+        if (!auth()->user()->is_voter) {
+            abort(403, 'Unauthorized');
+        }
+
         $candidates = User::where('is_candidate', true)->get();
         $session = VotingSession::where('is_active', true)
-        ->latest()
-        ->firstOrFail();
+            ->latest()
+            ->firstOrFail();
 
         return view('vote.index', compact('candidates', 'session'));
     }
 
     public function confirm(Request $request)
     {
+        if (!auth()->user()->is_voter) {
+            abort(403, 'Unauthorized');
+        }
+
         // If they arrived via GET (after a validation redirect), just show the form
         if ($request->isMethod('get')) {
             return $this->index();
@@ -68,6 +76,11 @@ class VoteController extends Controller
 
     public function submit(Request $request)
     {
+
+        if (!auth()->user()->is_voter) {
+            abort(403, 'Unauthorized');
+        }
+
         // 1) Validate input
         $data = $request->validate([
             'voter_id'        => 'required|string',
@@ -153,7 +166,7 @@ class VoteController extends Controller
         });
 
         // 8) Redirect with success
-        return redirect()->route('vote.index')
+        return redirect()->route('votes.index')
             ->with('success', 'رأی‌های شما با موفقیت ثبت شدند.');
     }
 }

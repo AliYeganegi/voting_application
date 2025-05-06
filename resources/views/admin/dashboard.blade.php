@@ -38,7 +38,8 @@
                         {{-- end‑approvals --}}
                         <div class="border rounded p-3 mb-3">
                             <h5>تأیید پایان رأی‌گیری توسط هیئت نظارت</h5>
-                            <p><strong>{{ $endApps->count() }} / 3</strong> هیئت نظارت تأیید کرده‌اند</p>
+                            <p><strong>{{ $endApps->count() }} / {{ $operators->count() - 1 }}</strong> هیئت نظارت تأیید کرده‌اند
+                            </p>
                             <ul class="mb-3">
                                 @foreach ($endApps as $app)
                                     <li>
@@ -71,7 +72,9 @@
 
                         <div class="border rounded p-3 mb-3">
                             <h5>تأیید پایان رأی‌گیری توسط هیئت نظارت</h5>
-                            <p><strong>{{ $endApps->count() }} / 3</strong> هیئت نظارت تأیید کرده‌اند</p>
+
+                            <p><strong>{{ $endApps->count() }} / {{$operators->count() - 1}}</strong> هیئت نظارت تأیید کرده‌اند
+                            </p>
                             <ul class="mb-3">
                                 @foreach ($endApps as $app)
                                     <li>
@@ -115,7 +118,8 @@
 
                         <div class="border rounded p-3 mb-3">
                             <h5>تأیید شروع رأی‌گیری توسط هیئت نظارت</h5>
-                            <p><strong>{{ $startApps->count() }} / 3</strong> هیئت نظارت تأیید کرده‌اند</p>
+                            <p><strong>{{ $startApps->count() }} / {{ $operators->count() - 1 }}</strong> هیئت نظارت تأیید
+                                کرده‌اند</p>
                             <ul class="mb-3">
                                 @foreach ($startApps as $app)
                                     <li>
@@ -157,7 +161,8 @@
                     </div>
                     <div class="border rounded p-3 mb-3">
                         <h5>تأیید شروع رأی‌گیری توسط هیئت نظارت</h5>
-                        <p><strong>{{ $startApps->count() }} / 3</strong> هیئت نظارت تأیید کرده‌اند</p>
+                        <p><strong>{{ $startApps->count() }} / {{ $operators->count() - 1 }}</strong> هیئت نظارت تأیید کرده‌اند
+                        </p>
                         <ul class="mb-3">
                             @foreach ($startApps as $app)
                                 <li>{{ $app->operator->name }} — {{ $app->created_at->format('H:i:s') }}</li>

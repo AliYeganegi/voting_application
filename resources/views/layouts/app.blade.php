@@ -20,10 +20,32 @@
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
             <div class="container">
 
-                <a class="navbar-brand d-flex align-items-center" href="{{ url('/') }}">
-                    <img src="{{ asset('storage/logo/logo.jpg') }}" alt="Logo" style="height: 70px; width: 70px;"
-                        class="me-2">
-                </a>
+                @if (!auth()->user())
+                    <a class="navbar-brand d-flex align-items-center" href="{{ url('/') }}">
+                        <img src="{{ asset('storage/logo/logo.jpg') }}" alt="Logo"
+                            style="height: 70px; width: 70px;" class="me-2">
+                    </a>
+                @elseif (auth()->user()->is_admin || auth()->user()->is_voter)
+                    <a class="navbar-brand d-flex align-items-center" href="{{ url('/') }}">
+                        <img src="{{ asset('storage/logo/logo.jpg') }}" alt="Logo"
+                            style="height: 70px; width: 70px;" class="me-2">
+                    </a>
+                @elseif (auth()->user()->is_verifier)
+                    <a class="navbar-brand d-flex align-items-center" href="{{ route('verify.index') }}">
+                        <img src="{{ asset('storage/logo/logo.jpg') }}" alt="Logo"
+                            style="height: 70px; width: 70px;" class="me-2">
+                    </a>
+                @elseif (auth()->user()->is_operator)
+                    <a class="navbar-brand d-flex align-items-center" href="{{ route('operator.session') }}">
+                        <img src="{{ asset('storage/logo/logo.jpg') }}" alt="Logo"
+                            style="height: 70px; width: 70px;" class="me-2">
+                    </a>
+                @else
+                    <a class="navbar-brand d-flex align-items-center" href="{{ url('/login') }}">
+                        <img src="{{ asset('storage/logo/logo.jpg') }}" alt="Logo"
+                            style="height: 70px; width: 70px;" class="me-2">
+                    </a>
+                @endif
 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarSupportedContent">
@@ -37,7 +59,7 @@
                             {{-- Admin --}}
                             @if (auth()->user()->is_admin)
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('vote.index') }}">
+                                    <a class="nav-link" href="{{ route('votes.index') }}">
                                         رأی‌دهی
                                     </a>
                                 </li>
@@ -151,7 +173,8 @@
                                         onclick="event.preventDefault();document.getElementById('logout-form').submit();">
                                         خروج
                                     </a>
-                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                    <form id="logout-form" action="{{ route('logout') }}" method="POST"
+                                        class="d-none">
                                         @csrf
                                     </form>
                                 </div>

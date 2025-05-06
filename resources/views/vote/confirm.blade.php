@@ -34,7 +34,7 @@
         </div>
 
         {{-- Hidden form --}}
-        <form id="voteForm" method="POST" action="{{ route('vote.submit') }}">
+        <form id="voteForm" method="POST" action="{{ route('votes.submit') }}">
             @csrf
             <input type="hidden" name="voter_id" value="{{ $voter_id }}">
             @foreach($candidates as $cand)
@@ -49,7 +49,7 @@
               بله، تأیید و ثبت رأی
             </button>
 
-            <a href="{{ route('vote.index') }}"
+            <a href="{{ route('votes.index') }}"
                class="btn btn-secondary w-100 mt-2">
               بازگشت و ویرایش
             </a>

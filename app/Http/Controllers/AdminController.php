@@ -31,6 +31,7 @@ class AdminController extends Controller
         $lastCandidateFile = ImportFile::where('type', 'candidates')->latest()->first();
         $previousSessions  = VotingSession::where('is_active', false)->orderBy('start_at', 'desc')->get();
         $lastCandidateImagesZip = ImportFile::where('type', 'candidate_images')->latest()->first();
+        $operators = User::where('is_operator' , 1)->get();
 
         // load approvals so far
         $startApps = $session
@@ -47,7 +48,8 @@ class AdminController extends Controller
             'previousSessions',
             'startApps',
             'endApps',
-            'lastCandidateImagesZip'
+            'lastCandidateImagesZip',
+            'operators',
         ));
     }
 

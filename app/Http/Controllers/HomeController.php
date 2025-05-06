@@ -25,8 +25,12 @@ class HomeController extends Controller
      */
     public function index()
     {
-        if (auth()->user()->is_verifier == 1 && auth()->user()->is_operator == 0) {
+        if (auth()->user()->is_verifier) {
             return redirect()->route('verify.index');
+        }
+
+        elseif (auth()->user()->is_operator) {
+            return redirect()->route('operator.session');
         }
 
         $session =  $session = VotingSession::where('is_active', true)

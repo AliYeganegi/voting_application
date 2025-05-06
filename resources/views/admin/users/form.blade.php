@@ -1,12 +1,17 @@
 @extends('layouts.app')
 @section('content')
     <div class="container">
+        @if (session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
+
         <h1 class="mb-4 text-center">
             {{ $user->exists ? 'ویرایش کاربر' : 'ایجاد کاربر' }}
         </h1>
 
-        <form method="POST"
-            action="{{ $user->exists ? route('users.update', $user) : route('users.store') }}">
+        <form method="POST" action="{{ $user->exists ? route('users.update', $user) : route('users.store') }}">
             @csrf
             @if ($user->exists)
                 @method('PUT')
@@ -24,6 +29,15 @@
                 <label class="form-label">ایمیل</label>
                 <input type="email" name="email" value="{{ old('email', $user->email) }}" class="form-control" required>
                 @error('email')
+                    <div class="text-danger">{{ $message }}</div>
+                @enderror
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">کد ملی</label>
+                <input type="text" name="national_id" value="{{ old('national_id', $user->national_id) }}"
+                    class="form-control">
+                @error('national_id')
                     <div class="text-danger">{{ $message }}</div>
                 @enderror
             </div>

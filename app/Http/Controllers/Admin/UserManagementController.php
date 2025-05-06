@@ -51,6 +51,7 @@ class UserManagementController extends Controller
             'name'        => 'required|string|max:255',
             'email'       => 'required|email|unique:users,email',
             'password'    => 'required|string|min:8|confirmed',
+            'national_id' => 'nullable',
             'is_operator' => '',
             'is_verifier' => '',
             'is_voter'    => '',
@@ -83,6 +84,7 @@ class UserManagementController extends Controller
             'name'        => 'required|string|max:255',
             'email'       => 'required|email|unique:users,email,' . $user->id,
             'password'    => 'nullable|string|min:8|confirmed',
+            'national_id' => 'nullable',
             'is_operator' => '',
             'is_verifier' => '',
             'is_voter'    => '',
@@ -106,7 +108,7 @@ class UserManagementController extends Controller
             ->orderBy('name')
             ->paginate(10);
 
-        return view('admin.users.index', compact('users'))
+        return back()
             ->with('success', 'اطلاعات کاربر با موفقیت به‌روز شد.');
     }
 

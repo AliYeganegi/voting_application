@@ -42,10 +42,17 @@ Route::match(['get', 'post'], 'vote/confirm', [VoteController::class, 'confirm']
 ->name('vote.confirms')
 ->middleware(CheckVerificationQueue::class);
 
+Route::post('vote/submit', [VoteController::class, 'submit'])
+->name('votes.submit');
+
 Route::post('/notifications/read', function () {
     auth()->user()->unreadNotifications->markAsRead();
     return back();
 })->name('notifications.read');
+
+Route::get('vote', [VoteController::class, 'index'])
+->name('votes.index')
+->middleware(CheckVotingSession::class);
 
 
 Route::middleware(['auth', OperatorMiddleware::class])->prefix('operator')->group(function () {
@@ -60,18 +67,12 @@ Route::middleware(['auth', OperatorMiddleware::class])->prefix('operator')->grou
         ->name('operator.session.approve-end');
 
     // (3) once enough operators have approved, session goes live
-    Route::get('vote', [VoteController::class, 'index'])
-        ->name('vote.index')
-        ->middleware(CheckVotingSession::class);
 
     Route::post('session/create‐and‐approve‐start', [OperatorController::class, 'createAndApproveStart'])
         ->name('operator.session.create-and-approve-start');
 
     Route::post('{session}/cancel', [OperatorController::class, 'cancelSession'])
         ->name('operator.session.cancel');
-
-    Route::post('vote/submit', [VoteController::class, 'submit'])
-        ->name('vote.submit');
 
     Route::get('/operator/history', [OperatorController::class, 'history'])->name('operator.history');
 
@@ -111,6 +112,8 @@ Route::middleware(['auth'])
             // Direct start / stop - Admin only
             Route::post('start', [AdminController::class, 'startVoting'])->name('admin.start');
             Route::post('stop',  [AdminController::class, 'endVoting'])->name('admin.stop');
+
+            Route::post('users', [UserManagementController::class, 'destroy']);
         });
 
         // Export Excel

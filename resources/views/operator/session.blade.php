@@ -72,7 +72,7 @@
                         <div class="card-body">
                             <h4>تأیید شروع رأی‌گیری</h4>
                             <p>
-                                <strong>{{ $startApps->count() }} / 3</strong>
+                                <strong>{{ $startApps->count() }} / {{ $operators->count() - 1 }}</strong>
                                 هیئت نظارت تأیید کرده‌اند
                             </p>
                             <ul>
@@ -101,7 +101,7 @@
                         <div class="card-body">
                             <h4>تأیید پایان رأی‌گیری</h4>
                             <p>
-                                <strong>{{ $endApps->count() }} / 3</strong>
+                                <strong>{{ $endApps->count() }} / {{ $operators->count() - 1 }}</strong>
                                 هیئت نظارت تأیید کرده‌اند
                             </p>
                             <ul>

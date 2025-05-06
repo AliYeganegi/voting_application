@@ -31,6 +31,7 @@
                 <tr>
                     <th>نام</th>
                     <th>ایمیل</th>
+                    <th>کد ملی</th>
                     <th>هیئت نظارت</th>
                     <th>تأییدکننده</th>
                     <th>رای دهنده</th>
@@ -42,6 +43,7 @@
                     <tr>
                         <td>{{ $user->name }}</td>
                         <td>{{ $user->email }}</td>
+                        <td>{{ $user->national_id }}</td>
                         <td class="text-center">
                             @if ($user->is_operator)
                                 <span class="badge bg-success">بلی</span>
