@@ -19,7 +19,7 @@
                 <div class="alert alert-danger">{{ $message }}</div>
             @enderror
 
-            <form method="POST" action="{{ route('vote.confirm') }}" class="bg-white p-4 rounded shadow-sm">
+            <form method="POST" action="{{ route('vote.confirms') }}" class="bg-white p-4 rounded shadow-sm">
                 @csrf
 
                 {{-- Voter ID --}}

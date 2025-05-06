@@ -38,6 +38,10 @@ Route::get('/vote/closed', fn() => view('vote.closed'))->name('vote.closed');
 |--------------------------------------------------------------------------
 */
 
+Route::match(['get', 'post'], 'vote/confirm', [VoteController::class, 'confirm'])
+->name('vote.confirms')
+->middleware(CheckVerificationQueue::class);
+
 Route::post('/notifications/read', function () {
     auth()->user()->unreadNotifications->markAsRead();
     return back();
@@ -65,10 +69,6 @@ Route::middleware(['auth', OperatorMiddleware::class])->prefix('operator')->grou
 
     Route::post('{session}/cancel', [OperatorController::class, 'cancelSession'])
         ->name('operator.session.cancel');
-
-    Route::match(['get', 'post'], 'vote/confirm', [VoteController::class, 'confirm'])
-        ->name('vote.confirm')
-        ->middleware(CheckVerificationQueue::class);
 
     Route::post('vote/submit', [VoteController::class, 'submit'])
         ->name('vote.submit');

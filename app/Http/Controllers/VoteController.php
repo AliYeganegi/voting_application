@@ -33,6 +33,10 @@ class VoteController extends Controller
             return $this->index();
         }
 
+        if (!auth()->user()->is_voter) {
+            abort(403, 'Unauthorized');
+        }
+
         // Otherwise it’s a POST—continue with your validation & confirm logic…
         $data = $request->validate([
             'voter_id'        => 'required|string',

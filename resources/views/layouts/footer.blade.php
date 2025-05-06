@@ -5,7 +5,7 @@
     <div class="container">
         <div class="row align-items-center">
             {{-- Right column: About (placed first in RTL) --}}
-            <div class="col-md-6 mb-3 mb-md-0 text-md-end">
+            <div class="col-md-6 mb-3 mb-md-0 text-center mx-auto">
                 <h6 class="fw-bold">سیستم رأی‌گیری</h6>
                 <p class="text-muted mb-1">
                     طراحی و توسعه توسط تیم فنی دانشگاه بین‌المللی امام خمینی (ره)
@@ -15,8 +15,9 @@
                 </p>
             </div>
 
+
             {{-- Left column: Contact (placed second in RTL) --}}
-            <div class="col-md-6 text-md-start">
+            {{-- <div class="col-md-6 text-md-start">
                 <p class="mb-1">تماس با ما</p>
                 <a href="mailto:aliyeganegi2002@gmail.com" class="text-decoration-none text-muted ms-3">
                     <i class="fas fa-envelope"></i>
@@ -30,7 +31,7 @@
                 <a href="https://github.com/AliYeganegi" class="text-muted" target="_blank">
                     <i class="fab fa-github"></i>
                 </a>
-            </div>
+            </div> --}}
         </div>
     </div>
 </footer>
