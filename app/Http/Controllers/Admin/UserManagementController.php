@@ -27,7 +27,7 @@ class UserManagementController extends Controller
                 foreach ($words as $word) {
                     $q->where(function ($subQuery) use ($word) {
                         $subQuery->where(DB::raw("REPLACE(REPLACE(name, CHAR(160), ' '), CHAR(8207), ' ')"), 'like', "%{$word}%")
-                                 ->orWhere(DB::raw("REPLACE(REPLACE(email, CHAR(160), ' '), CHAR(8207), ' ')"), 'like', "%{$word}%");
+                            ->orWhere(DB::raw("REPLACE(REPLACE(email, CHAR(160), ' '), CHAR(8207), ' ')"), 'like', "%{$word}%");
                     });
                 }
             });
@@ -69,8 +69,8 @@ class UserManagementController extends Controller
             ->orderBy('name')
             ->paginate(10);
 
-        return view('admin.users.index', compact('users'))
-            ->with('success', 'کاربر با موفقیت ایجاد شد.');
+        return back()
+            ->with('success', 'اطلاعات کاربر با موفقیت ثبت شد.');
     }
 
     public function edit(User $user)

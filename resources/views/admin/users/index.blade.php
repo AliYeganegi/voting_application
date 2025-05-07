@@ -1,6 +1,11 @@
 @extends('layouts.app')
 @section('content')
     <div class="container">
+        @if (session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
         <h1 class="mb-4 text-center">مدیریت هیئت نظارت و تأییدکنندگان</h1>
 
         @if (session('success'))
@@ -14,10 +19,10 @@
             ایجاد کاربر جدید
         </a>
 
-        <form method="GET" action="{{ route('users.index') }}" class="mb-4 d-flex justify-content-start align-items-center gap-2" dir="rtl">
+        <form method="GET" action="{{ route('users.index') }}"
+            class="mb-4 d-flex justify-content-start align-items-center gap-2" dir="rtl">
             <input type="text" name="search" class="form-control w-auto" style="min-width: 250px"
-                   placeholder="جستجوی نام یا ایمیل"
-                   value="{{ request('search') }}">
+                placeholder="جستجوی نام یا ایمیل" value="{{ request('search') }}">
 
             <button type="submit" class="btn btn-primary d-flex align-items-center gap-1">
                 <i class="bi bi-search"></i> {{-- Requires Bootstrap Icons --}}
