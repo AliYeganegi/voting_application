@@ -13,7 +13,13 @@ class UserManagementController extends Controller
 {
     public function index(Request $request)
     {
-        $query = User::where('is_admin', false)->orderBy('created_at', 'desc');
+        $query = User::where(function ($q) {
+            $q->where('is_admin', true)
+                ->orWhere('is_verifier', true)
+                ->orWhere('is_voter', true)
+                ->orWhere('is_operator', true);
+        })->orderBy('created_at', 'desc');
+
 
         if ($search = $request->input('search')) {
             // Normalize the search input

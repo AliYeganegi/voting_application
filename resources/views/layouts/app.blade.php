@@ -25,7 +25,12 @@
                         <img src="{{ asset('storage/logo/logo.jpg') }}" alt="Logo"
                             style="height: 70px; width: 70px;" class="me-2">
                     </a>
-                @elseif (auth()->user()->is_admin || auth()->user()->is_voter)
+                @elseif (auth()->user()->is_admin)
+                    <a class="navbar-brand d-flex align-items-center" href="{{ route('admin.dashboard') }}">
+                        <img src="{{ asset('storage/logo/logo.jpg') }}" alt="Logo"
+                            style="height: 70px; width: 70px;" class="me-2">
+                    </a>
+                @elseif (auth()->user()->is_voter)
                     <a class="navbar-brand d-flex align-items-center" href="{{ url('/') }}">
                         <img src="{{ asset('storage/logo/logo.jpg') }}" alt="Logo"
                             style="height: 70px; width: 70px;" class="me-2">
@@ -58,11 +63,6 @@
                         @auth
                             {{-- Admin --}}
                             @if (auth()->user()->is_admin)
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('votes.index') }}">
-                                        رأی‌دهی
-                                    </a>
-                                </li>
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('admin.dashboard') }}">
                                         پنل مدیریت
@@ -165,7 +165,8 @@
                             @endif --}}
                         @else
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button"
+                                    data-bs-toggle="dropdown">
                                     {{ Auth::user()->name }}
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-end">

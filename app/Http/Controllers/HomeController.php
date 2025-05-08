@@ -25,6 +25,10 @@ class HomeController extends Controller
      */
     public function index()
     {
+        if (auth()->user()->is_admin) {
+            return redirect()->route('admin.dashboard');
+        }
+
         if (auth()->user()->is_verifier) {
             return redirect()->route('verify.index');
         }

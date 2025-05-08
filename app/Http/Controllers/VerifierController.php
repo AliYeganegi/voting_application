@@ -3,6 +3,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\VotingSession;
 use App\Models\Verification;
@@ -78,7 +79,9 @@ class VerifierController extends Controller
             ->where('status', 'pending')
             ->count();
 
-        if ($count >= 3) {
+        $numberOfVerifiers = User::where('is_verifier', 1)->count();
+
+        if ($count >= ($numberOfVerifiers - 1) *3) {
             return back()->withErrors(['voter_id' => 'صف تأیید پر است. لطفاً صبر کنید.']);
         }
 
@@ -97,7 +100,7 @@ class VerifierController extends Controller
             'voter_id'          => $data['voter_id'],
             'voter_hash'        => $voterHash,
             'started_at'        => now(),
-            'expires_at'        => now()->addMinutes(20),
+            'expires_at'        => now()->addMinutes(8),
             'status'            => 'pending',
         ]);
 
