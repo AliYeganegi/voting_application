@@ -367,6 +367,7 @@ class AdminController extends Controller
 
         // Render our new Blade PDF template
         $html = view('admin.ballots-pdf', compact('session', 'ballots'))->render();
+        ini_set('pcre.backtrack_limit', 10_000_000);
         $mpdf->WriteHTML($html);
 
         $filename = "ballots_session_{$session->id}.pdf";
