@@ -125,8 +125,7 @@
         </div>
         <div class="ballot">
             <div class="ballot-header">
-                برگه رأی شماره {{ $loop->iteration }}
-                — {{ jdate($ballot->created_at)->format('H:i:s Y/m/d') }}
+                 {{ jdate($ballot->created_at)->format('H:i:s Y/m/d') }}
             </div>
             <div style="text-align: center; margin-bottom: 30px;">
                 <div style="text-align: center;">

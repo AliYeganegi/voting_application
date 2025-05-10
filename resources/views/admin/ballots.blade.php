@@ -88,8 +88,7 @@
         @forelse($ballots as $ballot)
             <div class="ballot">
                 <div class="ballot-header">
-                    برگه رأی شماره {{ $loop->iteration }}
-                    — {{ jdate($ballot->created_at)->format('H:i:s Y/m/d') }}
+                     {{ jdate($ballot->created_at)->format('H:i:s Y/m/d') }}
                 </div>
                 <table>
                     <thead>
