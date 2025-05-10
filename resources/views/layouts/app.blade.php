@@ -107,7 +107,9 @@
                             @endif --}}
 
                             {{-- Notifications --}}
-                            @php $unreads = auth()->user()->unreadNotifications; @endphp
+                            @php
+                                $unreads = auth()->user()->unreadNotifications;
+                            @endphp
                             <li class="nav-item dropdown">
                                 <a class="nav-link position-relative dropdown-toggle" href="#" role="button"
                                     data-bs-toggle="dropdown">
@@ -120,20 +122,42 @@
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end">
                                     @forelse($unreads as $note)
-                                        <li>
-                                            <a class="dropdown-item" href="#">
-                                                {{ $note->data['message'] }}
-                                                <br>
-                                                <small class="text-muted">
+                                        @if ($note->data['type'] === 'vote_cast')
+                                            @php
+                                                // Ensure $queue is always an array
+                                                $queue = $note->data['queue'] ?? [];
+                                            @endphp
+                                            <li class="dropdown-item">
+                                                <div class="text-success fw-bold">
+                                                    ✅ رأی ثبت شد: {{ $note->data['voter_name'] }}
+                                                    ({{ $note->data['voter_id'] }})
+                                                </div>
+
+                                                @if (count($queue) > 0)
+                                                    <div class="text-danger mt-2">
+                                                        ❌ در صف تأیید:
+                                                        <ul class="mb-0">
+                                                            @foreach ($queue as $queued)
+                                                                <li>{{ $queued['name'] }} ({{ $queued['id'] }})</li>
+                                                            @endforeach
+                                                        </ul>
+                                                    </div>
+                                                @endif
+
+                                                <small class="text-muted d-block mt-1">
                                                     {{ $note->created_at->diffForHumans() }}
                                                 </small>
-                                            </a>
-                                        </li>
+                                            </li>
+                                            <li>
+                                                <hr class="dropdown-divider">
+                                            </li>
+                                        @endif
                                     @empty
                                         <li class="dropdown-item text-center text-muted">
                                             اعلان جدیدی نیست
                                         </li>
                                     @endforelse
+
                                     <li>
                                         <hr class="dropdown-divider">
                                     </li>
@@ -147,6 +171,7 @@
                                     </li>
                                 </ul>
                             </li>
+
                         @endauth
                     </ul>
 

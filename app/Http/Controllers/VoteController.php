@@ -146,13 +146,14 @@ class VoteController extends Controller
                 ->where('voter_hash', $voterHash)
                 ->where('status', 'pending')
                 ->update(['status' => 'used']);
-
+                
             // 3d) Fire notifications
             $receivers = User::where(
                 fn($q) => $q
                     ->where('is_admin', true)
                     ->orWhere('is_operator', true)
                     ->orWhere('is_verifier', true)
+                    ->orWhere('is_voter', true)
             )->get();
 
             Notification::send(
@@ -160,7 +161,7 @@ class VoteController extends Controller
                 new VoteCastNotification(
                     $data['voter_id'],
                     "{$voter->first_name} {$voter->last_name}",
-                    $session
+                    $session->id
                 )
             );
         });

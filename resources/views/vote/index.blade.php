@@ -29,13 +29,13 @@
         }
 
         .form-label {
-            font-weight: bold;
+            /* font-weight: bold; */
             font-size: 1.1rem;
             color: #333;
         }
 
         .form-control {
-            font-weight: bold;
+            /* font-weight: bold; */
             font-size: 1.1rem;
             padding: 5px;
             border: 2px solid #007bff;

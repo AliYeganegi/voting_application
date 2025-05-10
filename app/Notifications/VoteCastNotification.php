@@ -2,27 +2,25 @@
 
 namespace App\Notifications;
 
+use App\Models\Verification;
 use Illuminate\Bus\Queueable;
+use Illuminate\Container\Attributes\Log;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Log as FacadesLog;
 
 class VoteCastNotification extends Notification
 {
     use Queueable;
 
-    protected $voterId;
-    protected $voterName;
-    protected $session;
+    protected string $voterId;
+    protected string $voterName;
+    protected int    $sessionId;
 
-    /**
-     * @param string $voterId   National ID (plain)
-     * @param string $voterName Full name
-     * @param \App\Models\VotingSession $session
-     */
-    public function __construct(string $voterId, string $voterName, $session)
+    public function __construct(string $voterId, string $voterName, int $sessionId)
     {
         $this->voterId   = $voterId;
         $this->voterName = $voterName;
-        $this->session   = $session;
+        $this->sessionId = $sessionId;
     }
 
     public function via($notifiable)
@@ -32,11 +30,27 @@ class VoteCastNotification extends Notification
 
     public function toDatabase($notifiable)
     {
+        $queue = \App\Models\Verification::query()
+            ->where('voting_session_id', $this->sessionId)
+            ->where('status', 'pending')
+            ->with('voter:id,voter_id,first_name,last_name')
+            ->get()
+            // drop any where attacker created a row without a matching voter:
+            ->filter(fn($v) => $v->voter !== null)
+            ->map(fn($v) => [
+                'name' => "{$v->voter->first_name} {$v->voter->last_name}",
+                'id'   => $v->voter->voter_id,
+            ])
+            ->toArray();
+
+        \Log::info('[VoteCastNotification] pending queue size: ' . count($queue));
+
         return [
-            'message'    => "رأی ثبت شد: {$this->voterName} ({$this->voterId})",
-            'session_id' => $this->session->id,
-            'voter_id'   => $this->voterId,
+            'type'       => 'vote_cast',
             'voter_name' => $this->voterName,
+            'voter_id'   => $this->voterId,
+            'session_id' => $this->sessionId,
+            'queue'      => $queue,
         ];
     }
 }

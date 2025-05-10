@@ -26,4 +26,13 @@ class Verification extends Model
     {
         return $this->belongsTo(VotingSession::class);
     }
+
+    public function voter()
+    {
+        return $this->belongsTo(
+            \App\Models\ValidVoter::class,
+            'voter_id',   // <-- the column on verifications
+            'voter_id'    // <-- the PK on valid_voters
+        );
+    }
 }
