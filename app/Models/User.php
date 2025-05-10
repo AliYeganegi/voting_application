@@ -28,6 +28,7 @@ class User extends Authenticatable
         'is_operator',
         'is_verifier',
         'is_voter',
+        'is_admin'
     ];
 
 

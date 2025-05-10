@@ -7,7 +7,7 @@ use App\Http\Controllers\VoteController;
 use App\Http\Controllers\VerifierController;
 use App\Http\Controllers\OperatorController;
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\Admin\UserManagementController;
+use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\VoterImportController;
 use App\Http\Controllers\VotingSessionController;
 use App\Http\Middleware\OperatorMiddleware;

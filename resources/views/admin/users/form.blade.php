@@ -72,6 +72,11 @@
                     {{ old('is_voter', $user->is_voter) ? 'checked' : '' }}>
                 <label class="form-check-label" for="vot">رأی دهنده</label>
             </div>
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" name="is_admin" id="admin"
+                    {{ old('is_admin', $user->is_admin) ? 'checked' : '' }}>
+                <label class="form-check-label" for="admin">ادمین</label>
+            </div>
 
             <button class="btn btn-success w-100">
                 {{ $user->exists ? 'بروزرسانی' : 'ایجاد' }}

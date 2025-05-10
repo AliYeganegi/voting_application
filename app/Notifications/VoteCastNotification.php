@@ -35,15 +35,12 @@ class VoteCastNotification extends Notification
             ->where('status', 'pending')
             ->with('voter:id,voter_id,first_name,last_name')
             ->get()
-            // drop any where attacker created a row without a matching voter:
             ->filter(fn($v) => $v->voter !== null)
             ->map(fn($v) => [
                 'name' => "{$v->voter->first_name} {$v->voter->last_name}",
                 'id'   => $v->voter->voter_id,
             ])
             ->toArray();
-
-        \Log::info('[VoteCastNotification] pending queue size: ' . count($queue));
 
         return [
             'type'       => 'vote_cast',

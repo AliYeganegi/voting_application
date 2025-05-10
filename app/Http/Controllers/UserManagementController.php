@@ -1,7 +1,7 @@
 <?php
-// app/Http/Controllers/Admin/UserManagementController.php
+// app/Http/Controllers/UserManagementController.php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
@@ -61,19 +61,17 @@ class UserManagementController extends Controller
             'is_operator' => '',
             'is_verifier' => '',
             'is_voter'    => '',
+            'is_admin'    => '',
         ]);
 
         $data['is_operator'] = $request->has('is_operator') ? 1 : 0;
         $data['is_verifier'] = $request->has('is_verifier') ? 1 : 0;
         $data['is_voter'] = $request->has('is_voter') ? 1 : 0;
+        $data['is_admin'] = $request->has('is_admin') ? 1 : 0;
 
         $data['password'] = Hash::make($data['password']);
 
         User::create($data);
-
-        $users = User::where('is_admin', false)
-            ->orderBy('name')
-            ->paginate(10);
 
         return back()
             ->with('success', 'اطلاعات کاربر با موفقیت ثبت شد.');
@@ -94,6 +92,7 @@ class UserManagementController extends Controller
             'is_operator' => '',
             'is_verifier' => '',
             'is_voter'    => '',
+            'is_admin'    => '',
         ]);
 
         // Convert checkboxes to 1/0
@@ -101,6 +100,7 @@ class UserManagementController extends Controller
         $data['is_verifier'] = $request->has('is_verifier') ? 1 : 0;
         $data['is_operator'] = $request->has('is_operator') ? 1 : 0;
         $data['is_voter'] = $request->has('is_voter') ? 1 : 0;
+        $data['is_admin'] = $request->has('is_admin') ? 1 : 0;
 
         if ($data['password'] ?? false) {
             $data['password'] = Hash::make($data['password']);
@@ -109,10 +109,6 @@ class UserManagementController extends Controller
         }
 
         $user->update($data);
-
-        $users = User::where('is_admin', false)
-            ->orderBy('name')
-            ->paginate(10);
 
         return back()
             ->with('success', 'اطلاعات کاربر با موفقیت به‌روز شد.');

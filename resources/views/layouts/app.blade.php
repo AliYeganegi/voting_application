@@ -122,7 +122,7 @@
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end">
                                     @forelse($unreads as $note)
-                                        @if ($note->data['type'] === 'vote_cast')
+                                        @if (isset($note->data['type']) && $note->data['type'] === 'vote_cast')
                                             @php
                                                 // Ensure $queue is always an array
                                                 $queue = $note->data['queue'] ?? [];
