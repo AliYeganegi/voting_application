@@ -116,7 +116,7 @@
 
             <h1>{{ $session->name }}</h1>
 
-            <h1>برگه‌های رأی</h1>
+            <h1>برگه‌ رأی</h1>
 
             <div class="times">
                 <p>شروع: {{ jdate($session->start_at)->format('H:i Y/m/d') }} - پایان:

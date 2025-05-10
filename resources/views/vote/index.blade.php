@@ -129,7 +129,7 @@
             const candidatesSection = document.getElementById('candidates-section');
 
             function toggleCandidatesSection() {
-                if (voterInput.value.trim().length > 0) {
+                if (voterInput.value.trim().length > 9) {
                     candidatesSection.classList.add('enabled');
                 } else {
                     candidatesSection.classList.remove('enabled');
