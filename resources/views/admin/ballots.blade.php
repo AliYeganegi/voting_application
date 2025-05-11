@@ -74,6 +74,10 @@
     </style>
 
     <div class="container">
+        <div id="download-msg" class="alert alert-info text-center" style="display: none;">
+            فایل شما در حال دانلود است. لطفا کمی صبر کنید
+        </div>
+
         <h1 class="text-center mb-2">
             برگ‌های رأی جلسه {{ $session->name }}
         </h1>
@@ -81,14 +85,14 @@
             {{ jdate($session->start_at)->format('H:i:s Y/m/d') }} - {{ jdate($session->end_at)->format('H:i:s Y/m/d') }}
         </h4>
         <div class="text-center mb-3">
-            <a href="{{ route('admin.sessions.ballots.pdf', $session) }}" class="btn btn-primary">
+            <a id="download-btn" href="{{ route('admin.sessions.ballots.pdf', $session) }}" class="btn btn-primary">
                 دانلود PDF برگ‌های رأی
             </a>
         </div>
         @forelse($ballots as $ballot)
             <div class="ballot">
                 <div class="ballot-header">
-                     {{ jdate($ballot->created_at)->format('H:i:s Y/m/d') }}
+                    {{ jdate($ballot->created_at)->format('H:i:s Y/m/d') }}
                 </div>
                 <table>
                     <thead>
@@ -129,4 +133,20 @@
         </div>
 
     </div>
+
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const btn = document.getElementById('download-btn');
+                const msg = document.getElementById('download-msg');
+
+                btn.addEventListener('click', function() {
+                    // show the message
+                    msg.style.display = 'block';
+                    // optionally disable the button to prevent double-clicks
+                    btn.classList.add('disabled');
+                });
+            });
+        </script>
+    @endpush
 @endsection

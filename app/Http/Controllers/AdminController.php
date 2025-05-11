@@ -31,7 +31,7 @@ class AdminController extends Controller
         $lastCandidateFile = ImportFile::where('type', 'candidates')->latest()->first();
         $previousSessions  = VotingSession::where('is_active', false)->orderBy('start_at', 'desc')->get();
         $lastCandidateImagesZip = ImportFile::where('type', 'candidate_images')->latest()->first();
-        $operators = User::where('is_operator' , 1)->get();
+        $operators = User::where('is_operator', 1)->get();
 
         // load approvals so far
         $startApps = $session
@@ -329,18 +329,20 @@ class AdminController extends Controller
 
     public function downloadBallotsPdf(VotingSession $session)
     {
-        // only after session has ended
         if ($session->is_active || ! $session->end_at) {
-            return back()->withErrors(['error' => 'نتایج تنها پس از پایان جلسه قابل دانلود است.']);
+            return back()->withErrors([
+                'error' => 'نتایج تنها پس از پایان جلسه قابل دانلود است.'
+            ]);
         }
 
-        $ballots = Ballot::with('candidates')->where('voting_session_id', $session->id)->get();
+        $ballots = Ballot::with('candidates')
+            ->where('voting_session_id', $session->id)
+            ->get();
 
-        // Instantiate mPDF with RTL and our Vazirmatn font
-        $configVars = (new \Mpdf\Config\ConfigVariables())->getDefaults();
-        $fontDirs   = $configVars['fontDir'];
-        $fontVars   = (new \Mpdf\Config\FontVariables())->getDefaults();
-        $fontData   = $fontVars['fontdata'];
+        // mPDF setup (fonts, RTL, etc.)
+        $config   = new \Mpdf\Config\ConfigVariables();
+        $fontDir  = $config->getDefaults()['fontDir'];
+        $fontVars = (new \Mpdf\Config\FontVariables())->getDefaults()['fontdata'];
 
         $mpdf = new Mpdf([
             'mode'             => 'utf-8',
@@ -349,8 +351,8 @@ class AdminController extends Controller
             'margin_right'     => 5,
             'margin_top'       => 5,
             'margin_bottom'    => 5,
-            'fontDir'          => array_merge($fontDirs, [storage_path('fonts')]),
-            'fontdata'         => array_merge($fontData, [
+            'fontDir'          => array_merge($fontDir, [storage_path('fonts')]),
+            'fontdata'         => array_merge($fontVars, [
                 'vazirmatn' => [
                     'R'         => 'Vazirmatn-Regular.ttf',
                     'B'         => 'Vazirmatn-Bold.ttf',
@@ -364,16 +366,22 @@ class AdminController extends Controller
         ]);
 
         $mpdf->SetDirectionality('rtl');
+        ini_set('pcre.backtrack_limit', 100_000_000);
 
-        // Render our new Blade PDF template
-        $html = view('admin.ballots-pdf', compact('session', 'ballots'))->render();
-        ini_set('pcre.backtrack_limit', 10_000_000);
-        $mpdf->WriteHTML($html);
+        // **Loop per ballot** so each HTML is small
+        foreach ($ballots as $i => $ballot) {
+            if ($i > 0) {
+                $mpdf->AddPage();       // new PDF page
+            }
+            $html = view('admin.ballot-page', compact('session', 'ballot'))
+                ->render();
+            $mpdf->WriteHTML($html);
+        }
 
         $filename = "ballots_session_{$session->id}.pdf";
-        $output   = $mpdf->Output($filename, 'S');
+        $pdf     = $mpdf->Output($filename, 'S');
 
-        return response($output, 200)
+        return response($pdf, 200)
             ->header('Content-Type', 'application/pdf')
             ->header('Content-Disposition', "attachment; filename=\"{$filename}\"");
     }
