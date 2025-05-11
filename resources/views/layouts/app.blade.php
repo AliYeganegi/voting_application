@@ -108,7 +108,7 @@
 
                             {{-- Notifications --}}
                             @php
-                                $unreads = auth()->user()->unreadNotifications;
+                                $unreads = auth()->user()->unreadNotifications->take(10);
                             @endphp
                             <li class="nav-item dropdown">
                                 <a class="nav-link position-relative dropdown-toggle" href="#" role="button"
@@ -124,7 +124,6 @@
                                     @forelse($unreads as $note)
                                         @if (isset($note->data['type']) && $note->data['type'] === 'vote_cast')
                                             @php
-                                                // Ensure $queue is always an array
                                                 $queue = $note->data['queue'] ?? [];
                                             @endphp
                                             <li class="dropdown-item">
@@ -169,8 +168,15 @@
                                             </button>
                                         </form>
                                     </li>
+                                    <li>
+                                        <a href="{{ route('notifications.index') }}"
+                                            class="dropdown-item text-center text-primary">
+                                            مشاهده همه اعلان‌ها
+                                        </a>
+                                    </li>
                                 </ul>
                             </li>
+
 
                         @endauth
                     </ul>

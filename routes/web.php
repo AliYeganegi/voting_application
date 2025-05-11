@@ -7,6 +7,7 @@ use App\Http\Controllers\VoteController;
 use App\Http\Controllers\VerifierController;
 use App\Http\Controllers\OperatorController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\VoterImportController;
 use App\Http\Controllers\VotingSessionController;
@@ -39,20 +40,26 @@ Route::get('/vote/closed', fn() => view('vote.closed'))->name('vote.closed');
 */
 
 Route::match(['get', 'post'], 'vote/confirm', [VoteController::class, 'confirm'])
-->name('vote.confirms')
-->middleware(CheckVerificationQueue::class);
+    ->name('vote.confirms')
+    ->middleware(CheckVerificationQueue::class);
 
 Route::post('vote/submit', [VoteController::class, 'submit'])
-->name('votes.submit');
+    ->name('votes.submit');
 
 Route::post('/notifications/read', function () {
     auth()->user()->unreadNotifications->markAsRead();
     return back();
 })->name('notifications.read');
 
+Route::middleware('auth')->group(function () {
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/read', [NotificationController::class, 'markAllAsRead'])->name('notifications.read');
+});
+
+
 Route::get('vote', [VoteController::class, 'index'])
-->name('votes.index')
-->middleware(CheckVotingSession::class);
+    ->name('votes.index')
+    ->middleware(CheckVotingSession::class);
 
 
 Route::middleware(['auth', OperatorMiddleware::class])->prefix('operator')->group(function () {
@@ -104,7 +111,7 @@ Route::middleware(['auth'])
     ->prefix('admin')
     ->group(function () {
         // Dashboard - Admin only
-        Route::middleware([AdminMiddleware::class])->group(function() {
+        Route::middleware([AdminMiddleware::class])->group(function () {
             Route::get('dashboard', [AdminController::class, 'dashboard'])
                 ->name('admin.dashboard');
             Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
@@ -135,7 +142,7 @@ Route::middleware(['auth'])
             ->name('admin.sessions.ballots');
 
         // Excel imports - Admin only
-        Route::middleware([AdminMiddleware::class])->group(function() {
+        Route::middleware([AdminMiddleware::class])->group(function () {
             Route::post('import-voters',     [VoterImportController::class, 'importVoters'])
                 ->name('admin.importVoters');
             Route::post('import-candidates', [VoterImportController::class, 'importCandidates'])
