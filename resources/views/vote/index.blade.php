@@ -51,6 +51,12 @@
     <div class="container">
         <h2 class="mb-4 text-center">صفحه رأی‌دهی</h2>
 
+        @if (request()->has('success'))
+            <div class="alert alert-success">
+                {{ request()->get('success') }}
+            </div>
+        @endif
+
         @if (!$session)
             <div class="alert alert-info text-center">
                 هنوز جلسه‌ای ایجاد نشده است.

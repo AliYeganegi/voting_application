@@ -46,6 +46,9 @@ Route::match(['get', 'post'], 'vote/confirm', [VoteController::class, 'confirm']
 Route::post('vote/submit', [VoteController::class, 'submit'])
     ->name('votes.submit');
 
+Route::get('vote/ballots/{ballot}/download', [VoteController::class, 'download'])
+    ->name('vote.ballots.download');
+
 Route::post('/notifications/read', function () {
     auth()->user()->unreadNotifications->markAsRead();
     return back();

@@ -11,8 +11,11 @@ use App\Models\VotingSession;
 use App\Notifications\VoteCastNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
+use Mpdf\Mpdf;
+use Illuminate\Support\Facades\Storage;
+use Mpdf\Config\ConfigVariables;
+use Mpdf\Config\FontVariables;
 
 class VoteController extends Controller
 {
@@ -23,7 +26,7 @@ class VoteController extends Controller
         }
 
         $candidates = User::where('is_candidate', true)->get();
-        $session = VotingSession::where('is_active', true)
+        $session    = VotingSession::where('is_active', true)
             ->latest()
             ->firstOrFail();
 
@@ -36,16 +39,10 @@ class VoteController extends Controller
             abort(403, 'Unauthorized');
         }
 
-        // If they arrived via GET (after a validation redirect), just show the form
         if ($request->isMethod('get')) {
             return $this->index();
         }
 
-        if (!auth()->user()->is_voter) {
-            abort(403, 'Unauthorized');
-        }
-
-        // Otherwise it’s a POST—continue with your validation & confirm logic…
         $data = $request->validate([
             'voter_id'        => 'required|string',
             'candidate_ids'   => 'nullable|array|max:5',
@@ -55,13 +52,11 @@ class VoteController extends Controller
             'candidate_ids.*.exists' => 'نامزد انتخاب‌شده نامعتبر است.',
         ]);
 
-        // Lookup voter
         $voter = ValidVoter::where('voter_id', $data['voter_id'])->first();
         if (! $voter) {
             return back()->withErrors(['voter_id' => 'کد ملی نامعتبر است.']);
         }
 
-        // Load selected candidates
         $selectedIds = $data['candidate_ids'] ?? [];
         $candidates  = User::whereIn('id', $selectedIds)->get();
 
@@ -73,15 +68,12 @@ class VoteController extends Controller
         ]);
     }
 
-
     public function submit(Request $request)
     {
-
         if (!auth()->user()->is_voter) {
             abort(403, 'Unauthorized');
         }
 
-        // 1) Validate input
         $data = $request->validate([
             'voter_id'        => 'required|string',
             'candidate_ids'   => 'nullable|array|max:5',
@@ -91,63 +83,42 @@ class VoteController extends Controller
             'candidate_ids.*.exists' => 'یک یا چند نامزد انتخاب‌شده نامعتبرند.',
         ]);
 
-        // 2) Lookup voter
-        $voter = ValidVoter::where('voter_id', $data['voter_id'])->first();
-        if (! $voter) {
-            return back()->withErrors(['voter_id' => 'کد ملی نامعتبر است.']);
-        }
+        $voter   = ValidVoter::where('voter_id', $data['voter_id'])->firstOrFail();
+        $session = VotingSession::where('is_active', true)->latest()->firstOrFail();
+        $hash    = hash('sha256', $data['voter_id']);
 
-        // 3) Get active session
-        $session = VotingSession::where('is_active', true)
-            ->latest()
-            ->firstOrFail();
-
-        // 4) Compute stable hash
-        $voterHash = hash('sha256', $data['voter_id']);
-
-        // 5) Count existing votes this hash has in this session
-        $alreadyCast = Vote::where('voting_session_id', $session->id)
-            ->where('hashed_voter_id', $voterHash)
+        $already  = Vote::where('voting_session_id', $session->id)
+            ->where('hashed_voter_id', $hash)
             ->count();
-
-        // 6) Determine new vote usage (blank counts as 1)
-        $countSelected = count($data['candidate_ids'] ?? []);
-        $newVotes      = $countSelected > 0 ? $countSelected : 1;
-
-        if ($alreadyCast + $newVotes > 5) {
+        $newVotes = max(1, count($data['candidate_ids'] ?? []));
+        if ($already + $newVotes > 5) {
             return back()->withErrors([
-                'candidate_ids' => "شما تا کنون {$alreadyCast} رأی ثبت کرده‌اید؛ نمی‌توانید بیش از ۵ رأی داشته باشید."
+                'candidate_ids' => "شما تا کنون {$already} رأی ثبت کرده‌اید؛ نمی‌توانید بیش از ۵ رأی داشته باشید."
             ]);
         }
 
-        // 7) Record within a transaction
-        DB::transaction(function () use ($session, $voterHash, $data, $voter) {
-            // a) Create individual Vote rows
-            foreach ($data['candidate_ids'] ?? [] as $candidateId) {
+        DB::transaction(function () use ($session, $hash, $data, $voter) {
+            foreach ($data['candidate_ids'] ?? [] as $cid) {
                 Vote::create([
-                    'hashed_voter_id'   => $voterHash,
-                    'candidate_id'      => $candidateId,
                     'voting_session_id' => $session->id,
+                    'hashed_voter_id'   => $hash,
+                    'candidate_id'      => $cid,
                 ]);
             }
 
-            // b) Create or update the Ballot and sync candidates
             $ballot = Ballot::updateOrCreate(
-                [
-                    'voting_session_id' => $session->id,
-                    'voter_hash'        => $voterHash,
-                ],
+                ['voting_session_id' => $session->id, 'voter_hash' => $hash],
                 []
             );
             $ballot->candidates()->sync($data['candidate_ids'] ?? []);
 
-            // c) Mark this verification as used
-            Verification::where('voting_session_id', $session->id)
-                ->where('voter_hash', $voterHash)
-                ->where('status', 'pending')
-                ->update(['status' => 'used']);
-                
-            // 3d) Fire notifications
+            Verification::where([
+                'voting_session_id' => $session->id,
+                'voter_hash'        => $hash,
+                'status'            => 'pending',
+            ])->update(['status' => 'used']);
+
+            // notify admins/operators/verifiers/voters
             $receivers = User::where(
                 fn($q) => $q
                     ->where('is_admin', true)
@@ -166,8 +137,111 @@ class VoteController extends Controller
             );
         });
 
-        // 8) Redirect with success
-        return redirect()->route('votes.index')
-            ->with('success', 'رأی‌های شما با موفقیت ثبت شدند.');
+        // reload the ballot
+        $ballot = Ballot::with('candidates')
+            ->where('voting_session_id', $session->id)
+            ->where('voter_hash', $hash)
+            ->firstOrFail();
+
+        //
+        // ─── MATCH endVoting() SETUP ────────────────────────────────────────
+        //
+        $configVars = (new ConfigVariables())->getDefaults();
+        $fontDirs   = $configVars['fontDir'];
+        $fontVars   = (new FontVariables())->getDefaults();
+        $fontData   = $fontVars['fontdata'];
+
+        $mpdf = new Mpdf([
+            'mode'             => 'utf-8',
+            'format'           => 'A4-P',
+            'margin_left'      => 5,
+            'margin_right'     => 5,
+            'margin_top'       => 5,
+            'margin_bottom'    => 5,
+            'fontDir'          => array_merge($fontDirs, [storage_path('fonts')]),
+            'fontdata'         => array_merge($fontData, [
+                'vazirmatn' => [
+                    'R'         => 'Vazirmatn-Regular.ttf',
+                    'B'         => 'Vazirmatn-Bold.ttf',
+                    'useOTL'    => 0xFF,
+                    'useKashida' => 75,
+                ],
+            ]),
+            'default_font'     => 'vazirmatn',
+            'autoLangToFont'   => true,
+            'autoScriptToLang' => true,
+        ]);
+
+        $mpdf->SetDirectionality('rtl');
+
+        // load the full HTML (including <head> with your @font-face CSS)
+        $fullHtml = view('admin.ballot-page', compact('session', 'ballot'))->render();
+
+        // write HTML in BODY mode so head/styles are respected
+        $mpdf->WriteHTML($fullHtml);
+
+        $pdfContent = $mpdf->Output('', 'S');
+        //
+        // ────────────────────────────────────────────────────────────────────
+        //
+
+        if ($request->ajax()) {
+            return response()->json([
+                'print_url'    => route('vote.ballots.download', $ballot->id),
+                'redirect_url' => route('votes.index'),
+                'message'      => 'رأی‌های شما با موفقیت ثبت شدند.',
+            ]);
+        }
+
+        return response($pdfContent, 200)
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', "inline; filename=\"ballot_{$ballot->id}.pdf\"");
+    }
+
+    /**
+     * Fallback download if JS/AJAX isn’t available.
+     */
+    public function download(Ballot $ballot)
+    {
+        // 1) Load session & candidates
+        $session = VotingSession::findOrFail($ballot->voting_session_id);
+        $ballot->load('candidates');
+
+        // 2) mPDF font & RTL config (same as in endVoting)
+        $configVars = (new ConfigVariables())->getDefaults();
+        $fontDirs   = $configVars['fontDir'];
+        $fontVars   = (new FontVariables())->getDefaults();
+        $fontData   = $fontVars['fontdata'];
+
+        $mpdf = new Mpdf([
+            'mode'           => 'utf-8',
+            'format'         => 'A4-P',
+            'margin_left'    => 5,
+            'margin_right'   => 5,
+            'margin_top'     => 5,
+            'margin_bottom'  => 5,
+            'fontDir'        => array_merge($fontDirs, [storage_path('fonts')]),
+            'fontdata'       => array_merge($fontData, [ /* … */]),
+            'default_font'   => 'vazirmatn',
+            'autoLangToFont' => true,
+            'autoScriptToLang' => true,
+        ]);
+        $mpdf->SetDirectionality('rtl');
+
+        // render the full template including its <head><style>…</head>
+        $html = view('admin.ballot-page', compact('session', 'ballot'))->render();
+
+        // write HTML so your in‐Blade CSS is applied
+        $mpdf->WriteHTML($html);
+
+        // stream it:
+        return response(
+            $mpdf->Output("ballot_{$ballot->id}.pdf", 'S'),
+            200,
+            [
+                'Content-Type'        => 'application/pdf',
+                'Content-Disposition' => "attachment; filename=\"ballot_{$ballot->id}.pdf\""
+            ]
+        );
     }
 }

@@ -4,7 +4,6 @@
     <h2 class="mb-4 text-center">تأیید رأی</h2>
 
     <div class="bg-white p-4 rounded shadow-sm">
-        {{-- Summary --}}
         <dl class="row">
             <dt class="col-sm-3">کد ملی:</dt>
             <dd class="col-sm-9">{{ $voter_id }}</dd>
@@ -28,7 +27,10 @@
                 </div>
             @empty
                 <div class="col-12">
-                    <p class="text-muted">شما هیچ یک از نامزد ها را انتخاب نکرده اید. <br>رای شما رای سفید محسوب می گردد.</p>
+                    <p class="text-muted">
+                        شما هیچ یک از نامزد ها را انتخاب نکرده‌اید.<br>
+                        رأی شما سفید محسوب می‌گردد.
+                    </p>
                 </div>
             @endforelse
         </div>
@@ -41,32 +43,31 @@
                 <input type="hidden" name="candidate_ids[]" value="{{ $cand->id }}">
             @endforeach
 
-            {{-- Step 1 button: opens modal --}}
             <button type="button"
                     class="btn btn-success w-100"
                     data-bs-toggle="modal"
                     data-bs-target="#confirmModal">
-              بله، تأیید و ثبت رأی
+                بله، تأیید و ثبت رأی
             </button>
 
             <a href="{{ route('votes.index') }}"
                class="btn btn-secondary w-100 mt-2">
-              بازگشت و ویرایش
+               بازگشت و ویرایش
             </a>
         </form>
     </div>
 </div>
 
-{{-- Bootstrap Modal for Step 2 --}}
+{{-- Confirmation Modal --}}
 <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content text-right">
       <div class="modal-header">
         <h5 class="modal-title" id="confirmModalLabel">تأیید نهایی رأی</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="بستن"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        <p>آیا واقعاً مایل به ثبت رأی خود هستید؟ بعد از تأیید نهایی امکان بازگشت نیست.</p>
+        <p>آیا واقعاً مایل به ثبت رأی خود هستید؟ بعد از تأیید امکان تغییر وجود ندارد.</p>
         <ul class="list-group">
           @forelse($candidates as $cand)
             <li class="list-group-item d-flex align-items-center">
@@ -96,11 +97,52 @@
         </button>
         <button type="button"
                 class="btn btn-success"
-                onclick="document.getElementById('voteForm').submit()">
+                id="confirmSubmitBtn">
           تأیید نهایی
         </button>
       </div>
     </div>
   </div>
 </div>
+
+@push('scripts')
+<script>
+// Improved error handling for debugging
+document.getElementById('confirmSubmitBtn').addEventListener('click', function() {
+  // hide modal manually
+  const modalEl = document.getElementById('confirmModal');
+  modalEl.classList.remove('show');
+  modalEl.setAttribute('aria-hidden', 'true');
+  modalEl.style.display = 'none';
+  document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+
+  const form = document.getElementById('voteForm');
+  fetch(form.action, {
+    method: form.method,
+    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+    body: new FormData(form)
+  })
+  .then(async res => {
+    if (!res.ok) {
+      const text = await res.text();
+      console.error('Server error:', res.status, text);
+      alert(`خطا ${res.status}: ${text}`);
+      throw new Error(text);
+    }
+    return res.json();
+  })
+  .then(json => {
+    // open PDF in new tab
+    window.open(json.print_url, '_blank');
+    // redirect with message
+    window.location.href = json.redirect_url + '?success=' + encodeURIComponent(json.message);
+  })
+  .catch(err => {
+    console.error('Fetch error:', err);
+    // error alert already shown above for server errors
+  });
+});
+</script>
+@endpush
+
 @endsection
