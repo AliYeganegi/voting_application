@@ -80,7 +80,7 @@
                 <div class="mb-3">
                     <label for="voter_id" class="form-label">کد ملی رأی‌دهنده</label>
                     <input type="text" name="voter_id" id="voter_id" class="form-control" placeholder="مثلاً ۱۲۳۴۵۶۷۸۹۰"
-                        required>
+                        required autocomplete="off">
                 </div>
 
                 {{-- Instruction --}}
