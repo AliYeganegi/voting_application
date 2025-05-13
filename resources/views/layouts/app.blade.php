@@ -107,75 +107,78 @@
                             @endif --}}
 
                             {{-- Notifications --}}
-                            @php
-                                $unreads = auth()->user()->unreadNotifications->take(10);
-                            @endphp
-                            <li class="nav-item dropdown">
-                                <a class="nav-link position-relative dropdown-toggle" href="#" role="button"
-                                    data-bs-toggle="dropdown">
-                                    🔔
-                                    @if ($unreads->count())
-                                        <span class="badge bg-danger position-absolute top-0 start-100 translate-middle">
-                                            {{ $unreads->count() }}
-                                        </span>
-                                    @endif
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    @forelse($unreads as $note)
-                                        @if (isset($note->data['type']) && $note->data['type'] === 'vote_cast')
-                                            @php
-                                                $queue = $note->data['queue'] ?? [];
-                                            @endphp
-                                            <li class="dropdown-item">
-                                                <div class="text-success fw-bold">
-                                                    ✅ رأی ثبت شد: {{ $note->data['voter_name'] }}
-                                                    ({{ $note->data['voter_id'] }})
-                                                </div>
-
-                                                @if (count($queue) > 0)
-                                                    <div class="text-danger mt-2">
-                                                        ❌ در صف تأیید:
-                                                        <ul class="mb-0">
-                                                            @foreach ($queue as $queued)
-                                                                <li>{{ $queued['name'] }} ({{ $queued['id'] }})</li>
-                                                            @endforeach
-                                                        </ul>
-                                                    </div>
-                                                @endif
-
-                                                <small class="text-muted d-block mt-1">
-                                                    {{ $note->created_at->diffForHumans() }}
-                                                </small>
-                                            </li>
-                                            <li>
-                                                <hr class="dropdown-divider">
-                                            </li>
+                            @if (!auth()->user()->is_admin)
+                                @php
+                                    $unreads = auth()->user()->unreadNotifications->take(10);
+                                @endphp
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link position-relative dropdown-toggle" href="#" role="button"
+                                        data-bs-toggle="dropdown">
+                                        🔔
+                                        @if ($unreads->count())
+                                            <span
+                                                class="badge bg-danger position-absolute top-0 start-100 translate-middle">
+                                                {{ $unreads->count() }}
+                                            </span>
                                         @endif
-                                    @empty
-                                        <li class="dropdown-item text-center text-muted">
-                                            اعلان جدیدی نیست
-                                        </li>
-                                    @endforelse
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        @forelse($unreads as $note)
+                                            @if (isset($note->data['type']) && $note->data['type'] === 'vote_cast')
+                                                @php
+                                                    $queue = $note->data['queue'] ?? [];
+                                                @endphp
+                                                <li class="dropdown-item">
+                                                    <div class="text-success fw-bold">
+                                                        ✅ رأی ثبت شد: {{ $note->data['voter_name'] }}
+                                                        ({{ $note->data['voter_id'] }})
+                                                    </div>
 
-                                    <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
-                                    <li>
-                                        <form method="POST" action="{{ route('notifications.read') }}">
-                                            @csrf
-                                            <button class="dropdown-item text-center">
-                                                علامت‌گذاری همه به‌عنوان خوانده‌شده
-                                            </button>
-                                        </form>
-                                    </li>
-                                    <li>
-                                        <a href="{{ route('notifications.index') }}"
-                                            class="dropdown-item text-center text-primary">
-                                            مشاهده همه اعلان‌ها
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
+                                                    @if (count($queue) > 0)
+                                                        <div class="text-danger mt-2">
+                                                            ❌ در صف تأیید:
+                                                            <ul class="mb-0">
+                                                                @foreach ($queue as $queued)
+                                                                    <li>{{ $queued['name'] }} ({{ $queued['id'] }})</li>
+                                                                @endforeach
+                                                            </ul>
+                                                        </div>
+                                                    @endif
+
+                                                    <small class="text-muted d-block mt-1">
+                                                        {{ $note->created_at->diffForHumans() }}
+                                                    </small>
+                                                </li>
+                                                <li>
+                                                    <hr class="dropdown-divider">
+                                                </li>
+                                            @endif
+                                        @empty
+                                            <li class="dropdown-item text-center text-muted">
+                                                اعلان جدیدی نیست
+                                            </li>
+                                        @endforelse
+
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li>
+                                            <form method="POST" action="{{ route('notifications.read') }}">
+                                                @csrf
+                                                <button class="dropdown-item text-center">
+                                                    علامت‌گذاری همه به‌عنوان خوانده‌شده
+                                                </button>
+                                            </form>
+                                        </li>
+                                        <li>
+                                            <a href="{{ route('notifications.index') }}"
+                                                class="dropdown-item text-center text-primary">
+                                                مشاهده همه اعلان‌ها
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            @endif
 
 
                         @endauth
