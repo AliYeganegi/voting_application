@@ -107,7 +107,7 @@
                             @endif --}}
 
                             {{-- Notifications --}}
-                            @if (!auth()->user()->is_admin)
+                            @if (!auth()->user()->is_voter)
                                 @php
                                     $unreads = auth()->user()->unreadNotifications->take(10);
                                 @endphp
